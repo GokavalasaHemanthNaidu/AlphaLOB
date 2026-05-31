@@ -2,7 +2,6 @@ __pycache__/
 *.pyc
 .env
 *.db
-models/*.onnx
 models/weights/*.pkl
 .pytest_cache/
 *.log
