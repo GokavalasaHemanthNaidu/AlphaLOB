@@ -27,8 +27,8 @@ async def lifespan(app: FastAPI):
     init_mlflow_db()
     
     # Startup: Launch workers
-    # Use synthetic generator by default for local execution
-    ingestion_worker = SyntheticLOBGenerator(queue=lob_queue, symbol="BTCUSDT", ticks_per_second=20)
+    from src.data.bybit_ws import BybitLiveLOBGenerator
+    ingestion_worker = BybitLiveLOBGenerator(queue=lob_queue, symbol="BTCUSDT")
     feature_worker = FeatureEngineeringWorker(input_queue=lob_queue, output_queue=features_queue)
     inference_worker = ModelInferenceWorker(input_queue=features_queue, output_queue=alpha_signals_queue)
     

@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import time
 import websockets
 
 logger = logging.getLogger(__name__)
@@ -50,7 +51,8 @@ class BybitLiveLOBGenerator:
                                     "a": data["a"][:10], # Keep top 10 levels
                                     "u": data.get("u", 0),
                                     "seq": data.get("seq", 0),
-                                    "type": msg.get("type", "delta") # "snapshot" or "delta"
+                                    "type": msg.get("type", "delta"), # "snapshot" or "delta"
+                                    "ts": msg.get("ts", int(time.time() * 1000))
                                 }
                                 
                                 await self.queue.put(formatted_data)
