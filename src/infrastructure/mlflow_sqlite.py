@@ -30,6 +30,19 @@ def init_mlflow_db():
         )
     ''')
     
+    # Table for tracking backtest experiments
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS backtest_runs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp REAL,
+            model_version TEXT,
+            hyperparameters TEXT,
+            sharpe_ratio REAL,
+            max_drawdown REAL,
+            break_even_bps REAL
+        )
+    ''')
+    
     conn.commit()
     conn.close()
 
@@ -80,3 +93,16 @@ def get_recent_distributions(limit: int = 1000):
     results = cursor.fetchall()
     conn.close()
     return results
+
+def log_backtest_run(model_version: str, hyperparams: dict, sharpe: float, max_dd: float, break_even_bps: float):
+    """
+    Mimics mlflow tracking for offline backtest experiments.
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO backtest_runs (timestamp, model_version, hyperparameters, sharpe_ratio, max_drawdown, break_even_bps) VALUES (?, ?, ?, ?, ?, ?)",
+        (time.time(), model_version, json.dumps(hyperparams), sharpe, max_dd, break_even_bps)
+    )
+    conn.commit()
+    conn.close()

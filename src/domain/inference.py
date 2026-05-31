@@ -30,40 +30,33 @@ class ONNXPredictor:
         bids_array and asks_array should have shape (batch_size, 10, 2)
         """
         if not self.session:
-            import random
-            # Return dummy predictions so the live demo dashboard works even without Colab!
-            return {
-                "dir_up_prob": random.uniform(0.1, 0.9),
-                "dir_flat_prob": 0.1,
-                "dir_down_prob": random.uniform(0.1, 0.9),
-                "spread_compress_prob": random.uniform(0.0, 1.0),
-                "vol_imbalance_pred": random.uniform(-1.5, 1.5)
-            }
+            return {"error": "Model not loaded"}
 
         # Ensure float32 (ONNX standard)
         bids_input = bids_array.astype(np.float32)
         asks_input = asks_array.astype(np.float32)
 
+        # The Colab PyTorch model expects a single tensor of shape [batch, 10, 4]
+        # (bid_price, bid_vol, ask_price, ask_vol)
+        lob_snapshot = np.concatenate([bids_input, asks_input], axis=-1)
+
         # ONNX Runtime inference
         inputs = {
-            "bids": bids_input,
-            "asks": asks_input
+            "lob_snapshot": lob_snapshot
         }
         
-        # Runs the model. Outputs order matches what we defined during export:
-        # ["direction_logits", "spread_prob", "imbalance_pred"]
+        # Runs the model. Outputs order matches Colab export:
+        # ['dir_5s', 'dir_30s', 'dir_5min', 'spread_compress', 'vol_imbalance']
         outputs = self.session.run(None, inputs)
         
-        # Softmax for logits
-        direction_logits = outputs[0][0]
-        # Softmax implementation in raw numpy:
-        exp_preds = np.exp(direction_logits - np.max(direction_logits))
-        dir_probs = exp_preds / exp_preds.sum()
+        # Sigmoid is baked into the ONNX graph for the first 4 outputs, so they are already probabilities
+        up_prob = float(outputs[0][0][0])
+        down_prob = 1.0 - up_prob # Simple binary inversion for demo purposes
         
         return {
-            "dir_up_prob": float(dir_probs[0]),
-            "dir_flat_prob": float(dir_probs[1]),
-            "dir_down_prob": float(dir_probs[2]),
-            "spread_compress_prob": float(outputs[1][0][0]),
-            "vol_imbalance_pred": float(outputs[2][0][0])
+            "dir_up_prob": up_prob,
+            "dir_flat_prob": 0.0,
+            "dir_down_prob": down_prob,
+            "spread_compress_prob": float(outputs[3][0][0]),
+            "vol_imbalance_pred": float(outputs[4][0][0])
         }

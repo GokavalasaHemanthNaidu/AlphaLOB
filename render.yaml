@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: alphalob-inference
+    env: docker
+    region: ohio
+    plan: free
+    branch: master
+    envVars:
+      - key: PORT
+        value: 8000
