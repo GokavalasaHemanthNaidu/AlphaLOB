@@ -43,6 +43,9 @@ class FeatureEngineeringWorker:
                 
                 self.input_queue.task_done()
                 
+                # Yield control to event loop to prevent starvation of Uvicorn HTTP requests
+                await asyncio.sleep(0)
+                
             except asyncio.CancelledError:
                 logger.info("FeatureEngineeringWorker cancelled.")
                 break
