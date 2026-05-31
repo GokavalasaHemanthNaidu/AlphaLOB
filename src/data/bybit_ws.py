@@ -17,6 +17,10 @@ class BybitLiveLOBGenerator:
         self.symbol = symbol
         self.ws_url = "wss://stream.bybit.com/v5/public/linear"
         
+        # Local order book state to maintain full depth from deltas
+        self.local_bids = {}
+        self.local_asks = {}
+        
     async def start(self):
         logger.info(f"Connecting to LIVE Bybit WebSocket for {self.symbol}...")
         
@@ -40,18 +44,34 @@ class BybitLiveLOBGenerator:
                         if "topic" in msg and msg["topic"] == f"orderbook.50.{self.symbol}":
                             data = msg.get("data", {})
                             
-                            # We only care if there are bids and asks present
-                            if "b" in data and "a" in data:
-                                # Bybit format matches our synthetic generator format exactly:
-                                # b: [[price, size], ...], a: [[price, size], ...]
-                                
+                            # We must maintain the order book locally because Bybit sends deltas!
+                            if "b" in data:
+                                for price, size in data["b"]:
+                                    if float(size) == 0:
+                                        self.local_bids.pop(price, None)
+                                    else:
+                                        self.local_bids[price] = size
+                                        
+                            if "a" in data:
+                                for price, size in data["a"]:
+                                    if float(size) == 0:
+                                        self.local_asks.pop(price, None)
+                                    else:
+                                        self.local_asks[price] = size
+                                        
+                            # Extract top 10 levels
+                            sorted_bids = sorted(self.local_bids.items(), key=lambda x: float(x[0]), reverse=True)[:10]
+                            sorted_asks = sorted(self.local_asks.items(), key=lambda x: float(x[0]))[:10]
+                            
+                            # Only emit to the model if we have a full 10-level book
+                            if len(sorted_bids) >= 10 and len(sorted_asks) >= 10:
                                 formatted_data = {
                                     "s": self.symbol,
-                                    "b": data["b"][:10], # Keep top 10 levels
-                                    "a": data["a"][:10], # Keep top 10 levels
+                                    "b": sorted_bids,
+                                    "a": sorted_asks,
                                     "u": data.get("u", 0),
                                     "seq": data.get("seq", 0),
-                                    "type": msg.get("type", "delta"), # "snapshot" or "delta"
+                                    "type": "snapshot", # We have reconstructed it into a snapshot
                                     "ts": msg.get("ts", int(time.time() * 1000))
                                 }
                                 
