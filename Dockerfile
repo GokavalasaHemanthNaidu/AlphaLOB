@@ -19,5 +19,5 @@ ENV OMP_NUM_THREADS=1
 # Expose the port Uvicorn will run on
 EXPOSE 8000
 
-# Run Uvicorn server when the container launches
-CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run Uvicorn server when the container launches, respecting Render's dynamic PORT
+CMD uvicorn src.api.main:app --host 0.0.0.0 --port ${PORT:-8000}
