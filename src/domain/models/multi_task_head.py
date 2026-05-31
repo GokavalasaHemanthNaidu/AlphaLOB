@@ -39,6 +39,10 @@ class MultiTaskHead(nn.Module):
             nn.ReLU(),
             nn.Linear(hidden_dim, 1)
         )
+        
+        # 4. Kendall Uncertainty Weighting (Learnable log variances for 5 tasks)
+        # s_k = log(sigma_k^2). Initialized to 0.
+        self.log_vars = nn.Parameter(torch.zeros(5))
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """
@@ -65,6 +69,20 @@ class MultiTaskHead(nn.Module):
         vol_imbalance = self.vol_imbalance_head(x)
         
         return dir_5s, dir_30s, dir_5m, spread_compress, vol_imbalance
+
+    def compute_loss(self, losses: list[torch.Tensor]) -> torch.Tensor:
+        """
+        Computes the Kendall et al. (2018) uncertainty-weighted multi-task loss.
+        L = sum_k ( exp(-s_k) * L_k + 0.5 * s_k )
+        """
+        assert len(losses) == 5, "Expected 5 task losses"
+        
+        total_loss = 0.0
+        for i, loss in enumerate(losses):
+            precision = torch.exp(-self.log_vars[i])
+            total_loss += precision * loss + 0.5 * self.log_vars[i]
+            
+        return total_loss
 
 class AlphaLOBModel(nn.Module):
     def __init__(self, n_levels: int = 10, features_per_level: int = 4, d_model: int = 64):

@@ -1,9 +1,6 @@
 import sys
 from unittest.mock import MagicMock
 sys.modules['polars'] = MagicMock()
-sys.modules['onnxruntime'] = MagicMock()
-sys.modules['hmmlearn'] = MagicMock()
-sys.modules['hmmlearn.hmm'] = MagicMock()
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 import asyncio
