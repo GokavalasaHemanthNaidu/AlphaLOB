@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+websockets
+pandas
+numpy
+sqlalchemy
+aiosqlite
+asyncpg
+torch
+aiokafka
+pydantic
+onnxruntime
