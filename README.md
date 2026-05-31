@@ -15,7 +15,9 @@ AlphaLOB is an end-to-end Machine Learning pipeline designed for **High-Frequenc
 
 
 
-https://github.com/user-attachments/assets/7722e015-77f3-499e-ae6f-aad76884111e
+https://github.com/user-attachments/assets/f9c9f71e-dbae-42f4-9a92-2dd4438cb004
+
+
 
 
 
