@@ -52,8 +52,8 @@ class ModelInferenceWorker:
                 from src.infrastructure.mlflow_sqlite import log_metric, log_prediction_distribution
                 
                 start_time = time.time()
-                # Run CPU inference (fast enough to not block async loop significantly)
-                predictions = self.predictor.predict(bids_arr, asks_arr)
+                # Run CPU inference in a separate thread so it doesn't starve the async event loop (fixing 502 Bad Gateway)
+                predictions = await asyncio.to_thread(self.predictor.predict, bids_arr, asks_arr)
                 latency_ms = (time.time() - start_time) * 1000
                 
                 if "error" not in predictions:
