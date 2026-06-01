@@ -80,13 +80,51 @@ You will instantly see the Server-Sent Events streaming the ONNX model's live pr
 
 ## 📁 Repository Structure
 
-* `src/api/` - FastAPI routes, WebSocket handlers, and SSE streaming.
-* `src/domain/models/` - Core PyTorch architectures (LOB Transformer, HMM).
-* `src/domain/inference.py` - The ONNX CPU Execution Provider logic.
-* `src/workers/` - Asynchronous background workers for feature engineering and ML inference.
-* `src/data/` - Synthetic Limit Order Book generators for testing.
-* `notebooks/colab/` - The GPU training scripts to be executed on Google Colab.
-* `models/` - Directory for downloaded `.onnx` and `.pkl` weights.
+```text
+AlphaLOB/
+├── src/
+│   ├── api/
+│   │   ├── main.py                  # FastAPI app + Asyncio Event Loop orchestration
+│   │   ├── schemas.py               # Pydantic models for type-safe validation
+│   │   └── routes/
+│   │       ├── signals.py           # Server-Sent Events (SSE) live streaming endpoint
+│   │       ├── predict.py           # REST endpoint for one-off snapshot inference
+│   │       ├── backtest.py          # Endpoint for launching historical simulations
+│   │       └── model_health.py      # Health checks & queue metric monitoring
+│   │
+│   ├── workers/                     # Async Background Workers (Pipeline)
+│   │   ├── feature_worker.py        # Computes spreads, depths, and WOFI in real-time
+│   │   └── inference_worker.py      # Offloads CPU-bound ONNX math to threadpools
+│   │
+│   ├── domain/
+│   │   ├── features.py              # Pure logic for Order Book feature engineering
+│   │   ├── inference.py             # Wrapper for ONNX Runtime (CPU optimized)
+│   │   ├── models/                  # PyTorch model definitions (used during training)
+│   │   │   ├── lob_transformer.py
+│   │   │   └── regime_hmm.py
+│   │   └── backtesting/             # Core logic for historical simulations
+│   │       ├── engine.py            
+│   │       └── metrics.py           
+│   │
+│   ├── data/
+│   │   ├── bybit_ws.py              # Live WebSocket ingestion from Bybit API
+│   │   └── synthetic_lob.py         # Local offline data generator (for testing)
+│   │
+│   └── infrastructure/              # Lightweight alternatives to heavy DBs
+│       ├── duckdb_client.py         # Embedded analytical DB for fast querying
+│       └── mlflow_sqlite.py         # SQLite tracking for ML metric logs
+│
+├── models/
+│   └── lob_transformer.onnx         # Compiled deep-learning model weights
+│
+├── Dockerfile                       # Single-container deployment (API + Workers)
+├── requirements.txt                 # Exact python dependencies
+└── .gitignore                       # Ignored cache and SQLite files
+```
+
+### 🧠 Architectural Decisions
+If you are wondering why there is no `docker-compose.yml`, `redis_client.py`, or `kafka_producer.py` in this structure: 
+This project was explicitly refactored to replace distributed Kafka/Redis clusters with incredibly fast `asyncio.Queue` channels in Python. This allowed the entire high-frequency pipeline to collapse into a single, highly-optimized Docker container that achieves near-zero latency and can run flawlessly on free cloud tiers.
 
 ---
 *Built by [Your Name]*
