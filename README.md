@@ -1,3 +1,12 @@
+---
+title: AlphaLOB
+emoji: 📈
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+---
+
 # ⚡ AlphaLOB: Real-Time High-Frequency Trading AI Architecture
 
 ![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)
