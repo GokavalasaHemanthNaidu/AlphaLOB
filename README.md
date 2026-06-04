@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/AlphaLOB-HFT%20AI%20Engine-blueviolet?style=for-the-badge&logo=lightning&logoColor=white" height="40"/>
+<a href="https://github.com/GokavalasaHemanthNaidu/AlphaLOB"><img src="https://img.shields.io/badge/AlphaLOB-HFT%20AI%20Engine-blueviolet?style=for-the-badge&logo=lightning&logoColor=white" height="40"/></a>
 
 # ⚡ AlphaLOB
 ### Real-Time High-Frequency Trading AI — Limit Order Book Signal Engine
