@@ -1,7 +1,52 @@
+# Python cache
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Environment variables
 .env
+.env.*
+
+# Database files (all formats)
 *.db
+*.duckdb
+*.sqlite
+*.sqlite3
+
+# ML model weights that are locally generated (NOT the committed .onnx — keep that)
 models/weights/*.pkl
-.pytest_cache/
+*.pt
+*.pth
+# Note: models/lob_transformer.onnx MUST stay committed for Hugging Face deployment
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Logs
 *.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# MyPy
+.mypy_cache/

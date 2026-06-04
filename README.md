@@ -136,4 +136,4 @@ If you are wondering why there is no `docker-compose.yml`, `redis_client.py`, or
 This project was explicitly refactored to replace distributed Kafka/Redis clusters with incredibly fast `asyncio.Queue` channels in Python. This allowed the entire high-frequency pipeline to collapse into a single, highly-optimized Docker container that achieves near-zero latency and can run flawlessly on free cloud tiers.
 
 ---
-*Built by [Your Name]*
+*Built by Gokavalasa Hemanth Naidu*
