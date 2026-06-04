@@ -4,9 +4,11 @@ import uuid
 import logging
 from typing import Dict, Any, List
 
+import os
+
 logger = logging.getLogger(__name__)
 
-DB_PATH = "alphalob.duckdb"
+DB_PATH = os.getenv("ALPHALOB_DB_PATH", "alphalob.duckdb")
 
 def init_db():
     """
@@ -18,7 +20,7 @@ def init_db():
     # Table: alpha_signals
     conn.execute("""
         CREATE TABLE IF NOT EXISTS alpha_signals (
-            signal_id UUID PRIMARY KEY DEFAULT uuid(),
+            signal_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             timestamp TIMESTAMP NOT NULL,
             symbol VARCHAR NOT NULL,
             dir_5s FLOAT,
@@ -31,12 +33,12 @@ def init_db():
             model_version VARCHAR,
             latency_ms FLOAT
         )
-    """)
+    """))
     
     # Table: backtest_runs
     conn.execute("""
         CREATE TABLE IF NOT EXISTS backtest_runs (
-            run_id UUID PRIMARY KEY DEFAULT uuid(),
+            run_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             status VARCHAR DEFAULT 'QUEUED',
             started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             completed_at TIMESTAMP,
@@ -49,12 +51,12 @@ def init_db():
             win_rate FLOAT,
             total_trades INTEGER
         )
-    """)
+    """))
     
     # Table: trade_log
     conn.execute("""
         CREATE TABLE IF NOT EXISTS trade_log (
-            trade_id UUID PRIMARY KEY DEFAULT uuid(),
+            trade_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             run_id UUID,
             timestamp TIMESTAMP NOT NULL,
             symbol VARCHAR,
@@ -66,7 +68,7 @@ def init_db():
             pnl FLOAT,
             cum_pnl FLOAT
         )
-    """)
+    """))
     conn.close()
     logger.info("Local DuckDB database initialized successfully.")
 
@@ -105,20 +107,9 @@ def get_backtest_run(run_id: str) -> Dict[str, Any]:
     conn.close()
     
     if result:
-        # DuckDB fetchone returns a tuple. We map it to dictionary.
-        # Columns: run_id, status, started_at, completed_at, config, sharpe_ratio, sortino_ratio, calmar_ratio, omega_ratio, max_drawdown, win_rate, total_trades
-        return {
-            "run_id": result[0],
-            "status": result[1],
-            "started_at": result[2],
-            "completed_at": result[3],
-            "config": result[4],
-            "sharpe_ratio": result[5],
-            "sortino_ratio": result[6],
-            "calmar_ratio": result[7],
-            "omega_ratio": result[8],
-            "max_drawdown": result[9],
-            "win_rate": result[10],
-            "total_trades": result[11]
-        }
+        # Use column names from cursor description to avoid index fragility
+        columns = ["run_id", "status", "started_at", "completed_at", "config",
+                   "sharpe_ratio", "sortino_ratio", "calmar_ratio", "omega_ratio",
+                   "max_drawdown", "win_rate", "total_trades"]
+        return dict(zip(columns, result))
     return None

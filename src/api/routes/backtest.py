@@ -26,14 +26,13 @@ def _run_backtest_job(run_id: str, config: BacktestConfig):
     update_backtest_status(run_id, "RUNNING")
     
     try:
-        # Simulate data fetch
-        # Create a dummy dataframe with 10,000 ticks
-        np.random.seed(42)
+        # Use a local RNG — avoids polluting global np.random state
+        rng = np.random.default_rng(42)
         n = 10000
         df = pl.DataFrame({
             "ts": range(n),
-            "mid_price": np.cumprod(1 + np.random.normal(0, 0.001, n)) * 60000,
-            "dir_5min_prob": np.random.uniform(0, 1, n),
+            "mid_price": np.cumprod(1 + rng.normal(0, 0.001, n)) * 60000,
+            "dir_5min_prob": rng.uniform(0, 1, n),
             "daily_volatility": np.full(n, 0.02),
             "avg_daily_volume": np.full(n, 5000)
         })
@@ -50,13 +49,14 @@ def _run_backtest_job(run_id: str, config: BacktestConfig):
         update_backtest_status(run_id, "COMPLETED", report)
         
     except Exception as e:
-        update_backtest_status(run_id, "FAILED")
-        raise e
+        # Store the error message so client can see it via /status
+        update_backtest_status(run_id, "FAILED", {"error": str(e)})
+        logger.error(f"Backtest {run_id} failed: {e}", exc_info=True)
 
 @router.post("/run")
 async def run_backtest(config: BacktestConfig, background_tasks: BackgroundTasks):
     # 1. Create entry in DB
-    run_id = create_backtest_run(config.dict())
+    run_id = create_backtest_run(config.model_dump())
     
     # 2. Enqueue background task
     background_tasks.add_task(_run_backtest_job, run_id, config)
