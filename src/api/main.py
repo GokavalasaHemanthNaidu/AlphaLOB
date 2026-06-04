@@ -95,8 +95,15 @@ from fastapi.responses import HTMLResponse
 
 LANDING_HTML = """
 <!DOCTYPE html>
-
 <html class="dark" lang="en"><head>
+<script>
+    // Prevent FOUC: apply theme before page renders
+    if (localStorage.theme === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+        document.documentElement.classList.remove('dark');
+    } else {
+        document.documentElement.classList.add('dark');
+    }
+</script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>"/>
@@ -382,8 +389,11 @@ LANDING_HTML = """
 <a class="text-primary dark:text-primary border-b-2 border-primary pb-1" href="#api">API</a>
 <a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary transition-colors duration-200" href="https://github.com/GokavalasaHemanthNaidu/AlphaLOB" target="_blank">GitHub</a>
 </nav>
-<div class="flex items-center">
-<button class="text-primary dark:text-primary hover:text-primary dark:hover:text-primary transition-colors duration-200">
+<div class="flex items-center gap-4">
+<button id="theme-toggle" class="text-primary dark:text-primary hover:text-primary transition-colors duration-200" aria-label="Toggle theme">
+<span class="material-symbols-outlined" id="theme-icon" style="font-variation-settings: 'FILL' 1;">light_mode</span>
+</button>
+<button class="text-primary dark:text-primary hover:text-primary transition-colors duration-200">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">sensors</span>
 </button>
 </div>
@@ -638,6 +648,28 @@ LANDING_HTML = """
 </div>
 </footer>
 <script>
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        function updateThemeIcon() {
+            if (document.documentElement.classList.contains('dark')) {
+                themeIcon.textContent = 'light_mode'; // clicking it will switch to light
+            } else {
+                themeIcon.textContent = 'dark_mode'; // clicking it will switch to dark
+            }
+        }
+        
+        // Initial setup
+        updateThemeIcon();
+
+        themeToggleBtn.addEventListener('click', function() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.theme = isDark ? 'dark' : 'light';
+            updateThemeIcon();
+        });
+
         // API Interactions
         const API_BASE = 'https://hemanthnaidug-alphalob.hf.space';
 
