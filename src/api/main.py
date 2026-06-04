@@ -6,9 +6,13 @@ import os
 import numpy as np
 import onnxruntime as ort
 import joblib
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List
+import time
+from collections import defaultdict
 
 # ── Model paths (relative to app.py location) ────────────────────────────────
 BASE_DIR   = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -31,6 +35,28 @@ app = FastAPI(
     description="Real-time LOB inference: directional probability + regime detection",
     version="1.0.0",
 )
+
+# ── CORS — allow interviewers/Postman to call the API from any origin ─────────
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
+# ── Rate Limiting — protect free-tier CPU (30 req/min per IP) ─────────────────
+_request_log: dict = defaultdict(list)
+
+@app.middleware("http")
+async def rate_limit(request: Request, call_next):
+    ip = request.client.host if request.client else "unknown"
+    now = time.time()
+    window = [t for t in _request_log[ip] if now - t < 60]
+    if len(window) >= 30:
+        return JSONResponse(status_code=429, content={"detail": "Rate limit exceeded. Max 30 requests/min."})
+    window.append(now)
+    _request_log[ip] = window
+    return await call_next(request)
 
 
 # ── Request/Response schemas ─────────────────────────────────────────────────
@@ -73,6 +99,10 @@ LANDING_HTML = """
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>"/>
+<meta name="description" content="AlphaLOB — Real-time Limit Order Book alpha signals via ONNX Transformer + HMM regime detection."/>
+<meta property="og:title" content="AlphaLOB | Real-Time LOB Alpha Signals"/>
+<meta property="og:description" content="51.25% directional accuracy. 5.47ms p99 latency. Zero look-ahead bias."/>
 <title>AlphaLOB | Real-Time Limit Order Book Alpha Signals</title>
 <!-- Material Symbols -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
