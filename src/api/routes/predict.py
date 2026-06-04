@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from typing import List, Dict, Any
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 import numpy as np
 
 # Lazily loaded predictor
@@ -17,9 +17,21 @@ router = APIRouter(prefix="/v1/predict", tags=["prediction"])
 
 class LOBSnapshot(BaseModel):
     symbol: str
-    b: List[List[str]]  # bid prices and sizes
-    a: List[List[str]]  # ask prices and sizes
+    b: List[List[float]]  # bid prices and sizes — [price, size] per level
+    a: List[List[float]]  # ask prices and sizes — [price, size] per level
     ts: int
+
+    @field_validator('b', 'a')
+    @classmethod
+    def validate_levels(cls, v):
+        if not v:
+            raise ValueError('LOB levels cannot be empty')
+        for i, row in enumerate(v):
+            if len(row) != 2:
+                raise ValueError(f'Level {i} must have exactly [price, size], got {len(row)} values')
+            if any(not isinstance(x, (int, float)) or x < 0 for x in row):
+                raise ValueError(f'Level {i} contains invalid (negative or non-numeric) values')
+        return v
 
 @router.post("")
 async def predict_single(snapshot: LOBSnapshot):

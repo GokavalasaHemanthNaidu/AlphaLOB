@@ -18,25 +18,26 @@ async def sse_generator(request_queue: asyncio.Queue):
     logger.info("New SSE client connected.")
     try:
         while True:
-            # Wait for a new signal to be produced by the InferenceWorker
-            signal = await request_queue.get()
-            
-            # SSE format requires "data: <json string>\n\n"
-            data_str = json.dumps(signal)
-            yield f"data: {data_str}\n\n"
-            
-            request_queue.task_done()
+            try:
+                # Wait for a new signal — 30s timeout prevents infinite hang
+                # if the inference worker dies
+                signal = await asyncio.wait_for(request_queue.get(), timeout=30.0)
+                data_str = json.dumps(signal)
+                yield f"data: {data_str}\n\n"
+                request_queue.task_done()
+            except asyncio.TimeoutError:
+                # Send heartbeat to keep connection alive
+                yield f"data: {json.dumps({'heartbeat': True})}\n\n"
     except asyncio.CancelledError:
         logger.info("SSE client disconnected.")
 
 @router.get("/live")
-async def live_signals():
+async def live_signals(request):
     """
     Subscribes to the real-time stream of Alpha Signals.
-    Downstream systems (e.g., Backtesting Engine or Order Execution) 
-    can listen to this endpoint.
+    Uses request.app.state to avoid circular import from main.py.
     """
-    from src.api.main import alpha_signals_queue
+    alpha_signals_queue = request.app.state.alpha_signals_queue
     
     return StreamingResponse(
         sse_generator(alpha_signals_queue),

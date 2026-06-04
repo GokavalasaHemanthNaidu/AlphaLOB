@@ -1,7 +1,9 @@
 import asyncio
 import logging
+import time
 import numpy as np
 from src.domain.inference import ONNXPredictor
+from src.infrastructure.mlflow_sqlite import log_metric, log_prediction_distribution
 
 logger = logging.getLogger(__name__)
 
@@ -47,9 +49,6 @@ class ModelInferenceWorker:
                 
                 snapshot = data.get("snapshot", {})
                 bids_arr, asks_arr = self._parse_snapshot_to_numpy(snapshot)
-                
-                import time
-                from src.infrastructure.mlflow_sqlite import log_metric, log_prediction_distribution
                 
                 start_time = time.time()
                 # Run CPU inference in a separate thread so it doesn't starve the async event loop (fixing 502 Bad Gateway)

@@ -18,9 +18,11 @@ def calculate_sortino(returns: np.ndarray, risk_free_rate: float = 0.0, periods_
         return 0.0
     excess_returns = returns - (risk_free_rate / periods_per_year)
     downside_returns = excess_returns[excess_returns < 0]
-    if len(downside_returns) == 0 or np.std(downside_returns) == 0:
+    if len(downside_returns) == 0:
+        return np.inf   # No losing periods — perfect strategy
+    downside_dev = np.std(downside_returns, ddof=1) if len(downside_returns) > 1 else abs(downside_returns[0])
+    if downside_dev < 1e-10:
         return 0.0
-    downside_dev = np.sqrt(np.mean(downside_returns**2))
     return np.sqrt(periods_per_year) * np.mean(excess_returns) / downside_dev
 
 def calculate_max_drawdown(equity_curve: np.ndarray) -> float:
@@ -52,6 +54,7 @@ def calculate_omega(returns: np.ndarray, threshold: float = 0.0) -> float:
     """
     above = returns[returns > threshold] - threshold
     below = threshold - returns[returns < threshold]
-    if np.sum(below) == 0:
-        return 0.0
-    return np.sum(above) / np.sum(below)
+    below_sum = np.sum(below)
+    if below_sum == 0:
+        return np.inf if np.sum(above) > 0 else 0.0   # Perfect: all gains, no losses
+    return np.sum(above) / below_sum

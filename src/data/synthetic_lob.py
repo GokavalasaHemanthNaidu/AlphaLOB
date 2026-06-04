@@ -6,7 +6,9 @@ import numpy as np
 from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+# NOTE: logging.basicConfig is intentionally NOT called here.
+# Logging is configured once at the application entry point (main.py).
+
 
 class SyntheticLOBGenerator:
     """
