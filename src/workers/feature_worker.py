@@ -16,6 +16,7 @@ class FeatureEngineeringWorker:
         self.output_queue = output_queue
         self.engine = FeatureEngine(depth_levels=10)
         self.running = False
+        self._drop_count = 0   # tracks how many ticks were dropped due to backpressure
         
     async def start(self):
         self.running = True
@@ -35,11 +36,19 @@ class FeatureEngineeringWorker:
                         "snapshot": snapshot,
                         "features": features
                     }
-                    # Non-blocking push to Phase 3 queue
+                    # Non-blocking push to Phase 3 queue.
+                    # Note: we intentionally do NOT await queue.put() here because
+                    # blocking would stall the event loop on 8GB RAM hardware.
+                    # Instead we track drop rate so it is visible in logs.
                     if not self.output_queue.full():
                         self.output_queue.put_nowait(enriched_data)
                     else:
-                        logger.warning("Features output queue is full. Dropping data.")
+                        self._drop_count += 1
+                        if self._drop_count % 100 == 0:
+                            logger.warning(
+                                f"Feature queue backpressure: {self._drop_count} ticks dropped total. "
+                                f"Consider reducing tick rate or increasing queue size."
+                            )
                 
                 self.input_queue.task_done()
                 
