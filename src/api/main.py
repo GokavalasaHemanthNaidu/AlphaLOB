@@ -113,6 +113,12 @@ LANDING_HTML = """
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <!-- Tailwind Config injected from Design System -->
+<style type="text/tailwindcss">
+        @layer utilities {
+          .pipeline-step { cursor: pointer; transition: opacity 0.2s; }
+          .pipeline-step:hover { opacity: 0.8; }
+        }
+</style>
 <script id="tailwind-config">
         tailwind.config = {
           darkMode: "class",
@@ -261,7 +267,7 @@ LANDING_HTML = """
           },
         }
     </script>
-<style>
+<style type="text/tailwindcss">
         /* Custom styles for terminal/high-performance feel */
         body {
             background-color: theme('colors.background');
@@ -279,11 +285,10 @@ LANDING_HTML = """
         
         /* Terminal Typing Effect */
         .typing-effect {
-            overflow: hidden; 
+            overflow: hidden;
+            white-space: nowrap;
             border-right: 2px solid theme('colors.primary');
-            white-space: nowrap; 
-            margin: 0;
-            animation: typing 2s steps(40, end), blink-caret .75s step-end infinite;
+            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
         }
 
         @keyframes typing {
@@ -371,345 +376,508 @@ LANDING_HTML = """
     </style>
 </head>
 <body class="bg-background text-on-background font-body-md text-body-md min-h-screen flex flex-col antialiased">
-<!-- Top Navigation (Generated from JSON) -->
-<header class="bg-surface dark:bg-surface text-primary dark:text-primary docked full-width top-0 sticky border-b border-outline-variant dark:border-outline-variant flat no shadows flex justify-between items-center w-full px-container-margin py-stack-compact max-w-full z-50 bg-surface/95 backdrop-blur-sm">
-<div class="flex items-center gap-gutter">
-<span class="text-title-sm font-title-sm font-bold text-on-surface dark:text-on-surface">AlphaLOB</span>
-</div>
-<nav class="hidden md:flex gap-container-margin items-center">
-<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary transition-colors duration-200" href="#documentation">Documentation</a>
-<a class="text-primary dark:text-primary border-b-2 border-primary pb-1" href="#api">API</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary transition-colors duration-200" href="https://github.com/GokavalasaHemanthNaidu/AlphaLOB" target="_blank">GitHub</a>
-</nav>
-<div class="flex items-center">
-<button class="text-primary dark:text-primary hover:text-primary transition-colors duration-200">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">sensors</span>
-</button>
-</div>
+<!-- Top Navigation -->
+<header class="flex justify-between items-center py-4 border-b border-gray-800 px-6 max-w-7xl mx-auto w-full">
+  <div class="text-xl font-bold text-white tracking-tight">AlphaLOB</div>
+  <nav class="space-x-6 text-sm flex items-center">
+    <span id="api-status" class="text-xs font-mono">● Checking...</span>
+    <a href="#api" class="text-gray-400 hover:text-white transition">API</a>
+    <a href="https://github.com/GokavalasaHemanthNaidu/AlphaLOB" target="_blank" class="text-gray-400 hover:text-white transition">GitHub</a>
+  </nav>
 </header>
-<main class="flex-grow p-container-margin md:p-8 space-y-12">
+<main class="flex-grow p-4 md:p-8 space-y-12">
 <!-- Section 1: Hero -->
-<section class="flex flex-col items-start gap-stack-default max-w-7xl mx-auto w-full">
-<div class="flex items-center gap-gutter flex-wrap mb-2">
-<span class="px-2 py-1 bg-secondary/15 border border-secondary text-secondary font-label-caps text-label-caps rounded-DEFAULT flex items-center gap-1">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
-                    LIVE
-                </span>
-<span class="px-2 py-1 bg-primary/15 border border-primary text-primary font-label-caps text-label-caps rounded-DEFAULT">
-                    ONNX Runtime
-                </span>
-<span class="px-2 py-1 bg-tertiary/15 border border-tertiary text-tertiary font-label-caps text-label-caps rounded-DEFAULT">
-                    Zero Look-Ahead Bias
-                </span>
-</div>
-<h1 class="font-display-lg text-display-lg text-on-surface typing-effect inline-block pr-2">
-                &gt; AlphaLOB_
-            </h1>
-<p class="font-headline-md text-headline-md text-on-surface-variant mt-stack-compact">
-                Real-Time Limit Order Book Alpha Signals
-            </p>
+<section class="max-w-7xl mx-auto w-full pt-8">
+  <div class="flex gap-2 mb-4">
+    <span class="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">● LIVE</span>
+    <span class="px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold">ONNX Runtime</span>
+    <span class="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">Zero Look-Ahead Bias</span>
+  </div>
+  
+  <h1 class="text-4xl md:text-5xl font-mono font-bold text-white mb-2">
+    > AlphaLOB<span class="animate-pulse">_</span>
+  </h1>
+  <p class="text-xl text-gray-400 font-light">Real-Time Limit Order Book Alpha Signals</p>
 </section>
-<!-- Scientific Integrity Banner -->
+
+<!-- Mathematical Rigor Banner -->
 <section class="max-w-7xl mx-auto w-full">
-<div class="border border-tertiary bg-tertiary/5 p-4 rounded-DEFAULT flex items-start gap-4">
-<span class="material-symbols-outlined text-tertiary mt-1">warning</span>
-<p class="text-body-sm text-on-surface-variant">
-<strong class="text-tertiary font-medium">Scientific Integrity:</strong> 51.25% is the theoretical maximum accuracy for a WOFI-return correlation of 0.044. Any model claiming &gt;55% on this synthetic data would indicate data leakage or label injection. This result validates that the pipeline is mathematically sound and leak-free.
-            </p>
-</div>
+  <div class="mb-10 p-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
+    <p class="text-sm text-emerald-300">
+      <span class="font-bold">✓ Mathematical Rigor:</span> 51.25% directional accuracy matches the theoretical ceiling for a WOFI-return correlation of 0.044. This validates zero data leakage and a causally sound pipeline.
+    </p>
+  </div>
 </section>
 <!-- Section 2: Metrics Grid -->
-<section class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<section class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 <!-- Accuracy -->
-<div class="bg-surface-container border border-surface-container-highest p-stack-default rounded-DEFAULT glow-hover transition-colors">
-<div class="flex items-center justify-between mb-stack-compact">
-<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Predictive Edge</span>
-<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 0;">analytics</span>
+<div class="bg-gray-800/30 border border-gray-700 p-6 rounded-DEFAULT hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300">
+<div class="flex items-center justify-between mb-4">
+<span class="text-xs text-gray-400 uppercase tracking-wider">Predictive Edge</span>
+<span class="material-symbols-outlined text-blue-400 text-sm">analytics</span>
 </div>
-<div class="font-headline-md text-headline-md text-on-surface mb-1 flex items-center">
-<span class="text-secondary text-sm mr-1">▲</span> 51.25%
-                </div>
-<div class="font-body-sm text-body-sm text-outline tooltip cursor-help border-b border-dashed border-outline">
-                    Honest Ceiling
-                    <span class="tooltiptext">Theoretical ceiling for highly stochastic process (ρ=0.044) without look-ahead bias.</span>
+<div class="text-2xl text-white mb-1 flex items-center">
+<span class="text-emerald-400 text-sm mr-1">▲</span> 51.25%
+</div>
+<div class="text-sm text-gray-500 border-b border-dashed border-gray-600 inline-block group relative cursor-help">
+Honest Ceiling
+  <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 bg-gray-900 text-gray-300 text-xs rounded border border-gray-700 shadow-xl z-20 text-center">
+    Theoretical ceiling for highly stochastic process (ρ=0.044) without look-ahead bias.
+  </div>
 </div>
 </div>
 <!-- Latency -->
-<div class="bg-surface-container border border-surface-container-highest p-stack-default rounded-DEFAULT glow-hover transition-colors relative overflow-hidden">
-<div class="flex items-center justify-between mb-stack-compact">
-<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Inference Latency</span>
-<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 0;">speed</span>
+<div class="bg-gray-800/30 border border-gray-700 p-6 rounded-DEFAULT hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group/card">
+<div class="flex items-center justify-between mb-4">
+<span class="text-xs text-gray-400 uppercase tracking-wider">Inference Latency</span>
+<span class="material-symbols-outlined text-blue-400 text-sm">speed</span>
 </div>
-<div class="font-headline-md text-headline-md text-on-surface mb-1">
-                    5.47ms
-                </div>
-<div class="font-body-sm text-body-sm text-outline tooltip cursor-help border-b border-dashed border-outline mb-3">
-                    p99 Threshold
-                    <span class="tooltiptext">p99 latency measured on standard CPU. Target SLA is &lt;15ms.</span>
+<div class="text-2xl text-white mb-1 relative z-10">
+5.47ms
+</div>
+<div class="text-xs text-gray-500 border-b border-dashed border-gray-600 inline-block mt-1 group relative cursor-help z-10">
+  p50: 0.82ms · p90: 1.18ms · p95: 1.29ms · <span class="text-emerald-400">p99: 5.47ms</span>
+  <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 bg-gray-900 text-gray-300 text-xs rounded border border-gray-700 shadow-xl z-20 text-center">
+    p99 latency measured on standard CPU. Target SLA is &lt;15ms.
+  </div>
 </div>
 <!-- Sparkline Chart -->
-<div class="absolute bottom-0 left-0 w-full h-10 flex items-end px-2 pb-1 gap-1 opacity-80">
-<div class="w-1/4 bg-primary/40 rounded-t-sm tooltip" style="height: 10%;">
-<span class="tooltiptext mb-6">p50: 0.82ms</span>
-</div>
-<div class="w-1/4 bg-primary/60 rounded-t-sm tooltip" style="height: 15%;">
-<span class="tooltiptext mb-6">p90: 1.18ms</span>
-</div>
-<div class="w-1/4 bg-primary/80 rounded-t-sm tooltip" style="height: 20%;">
-<span class="tooltiptext mb-6">p95: 1.29ms</span>
-</div>
-<div class="w-1/4 bg-primary rounded-t-sm tooltip" style="height: 80%;">
-<span class="tooltiptext mb-6">p99: 5.47ms</span>
-</div>
-<!-- 15ms target line -->
-<div class="absolute top-2 left-0 w-full border-t border-error border-dashed pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full h-10 flex items-end px-2 gap-1 opacity-30 group-hover/card:opacity-80 transition-opacity z-0 pointer-events-none">
+  <div class="w-1/4 bg-blue-500/40 rounded-t-sm" style="height: 20%;"></div>
+  <div class="w-1/4 bg-blue-500/60 rounded-t-sm" style="height: 30%;"></div>
+  <div class="w-1/4 bg-blue-500/80 rounded-t-sm" style="height: 40%;"></div>
+  <div class="w-1/4 bg-emerald-500/80 rounded-t-sm" style="height: 80%;"></div>
 </div>
 </div>
 <!-- Architecture -->
-<div class="bg-surface-container border border-surface-container-highest p-stack-default rounded-DEFAULT glow-hover transition-colors">
-<div class="flex items-center justify-between mb-stack-compact">
-<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Core Engine</span>
-<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 0;">memory</span>
+<div class="bg-gray-800/30 border border-gray-700 p-6 rounded-DEFAULT hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300">
+<div class="flex items-center justify-between mb-4">
+<span class="text-xs text-gray-400 uppercase tracking-wider">Core Engine</span>
+<span class="material-symbols-outlined text-blue-400 text-sm">memory</span>
 </div>
-<div class="font-headline-md text-headline-md text-on-surface mb-1">
-                    6-L Transformer
-                </div>
-<div class="font-body-sm text-body-sm text-outline tooltip cursor-help border-b border-dashed border-outline">
-                    Attention Mech
-                    <span class="tooltiptext">8 Attention Heads, d_model=64. Optimized for sequence modeling.</span>
+<div class="text-2xl text-white mb-1">
+6-Layer Transformer
+</div>
+<div class="text-sm text-gray-500 border-b border-dashed border-gray-600 inline-block group relative cursor-help">
+8-Head Attention
+  <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 bg-gray-900 text-gray-300 text-xs rounded border border-gray-700 shadow-xl z-20 text-center">
+    Multi-head attention captures complex order book spatial features.
+  </div>
 </div>
 </div>
 <!-- Regime -->
-<div class="bg-surface-container border border-surface-container-highest p-stack-default rounded-DEFAULT glow-hover transition-colors">
-<div class="flex items-center justify-between mb-stack-compact">
-<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Market State</span>
-<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 0;">waves</span>
+<div class="bg-gray-800/30 border border-gray-700 p-6 rounded-DEFAULT hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300">
+<div class="flex items-center justify-between mb-4">
+<span class="text-xs text-gray-400 uppercase tracking-wider">Market State</span>
+<span class="material-symbols-outlined text-blue-400 text-sm">waves</span>
 </div>
-<div class="font-headline-md text-headline-md text-on-surface mb-1">
-                    3-State HMM
-                </div>
-<div class="font-body-sm text-body-sm text-outline tooltip cursor-help border-b border-dashed border-outline">
-                    Context Switcher
-                    <span class="tooltiptext">Hidden Markov Model conditioning on realized volatility and autocorrelation.</span>
+<div class="text-2xl text-white mb-1">
+3-State HMM
+</div>
+<div class="text-sm text-gray-500 border-b border-dashed border-gray-600 inline-block group relative cursor-help">
+Gaussian HMM Regimes
+  <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 bg-gray-900 text-gray-300 text-xs rounded border border-gray-700 shadow-xl z-20 text-center">
+    Unsupervised segmentation of market conditions into Trending, Mean-Reverting, and Volatile states.
+  </div>
 </div>
 </div>
+</section>
+
+<!-- Quick Live Demo -->
+<section class="max-w-7xl mx-auto w-full mt-12 border border-gray-700 rounded-lg p-6 bg-gray-800/30">
+  <h3 class="text-lg font-semibold text-white mb-4">🔴 Live API Test</h3>
+  <div class="flex gap-4">
+    <button onclick="quickTestHealth()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded text-white text-sm font-medium transition">
+      Test /health
+    </button>
+    <button onclick="quickTestPredict()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded text-white text-sm font-medium transition">
+      Test /predict
+    </button>
+  </div>
+  <pre id="quick-api-output" class="mt-4 p-3 bg-black rounded text-xs text-green-400 font-mono hidden overflow-x-auto"></pre>
+</section>
+
+<script>
+async function quickTestHealth() {
+  const out = document.getElementById('quick-api-output');
+  out.classList.remove('hidden');
+  out.textContent = 'Loading /health...';
+  try {
+    const res = await fetch('/health');
+    const data = await res.json();
+    out.textContent = JSON.stringify(data, null, 2);
+  } catch (e) {
+    out.textContent = 'Error: ' + e.message;
+  }
+}
+async function quickTestPredict() {
+  const out = document.getElementById('quick-api-output');
+  out.classList.remove('hidden');
+  out.textContent = 'Loading /predict...';
+  try {
+    const lob_snapshot = Array.from({length: 10}, () => [Math.random()*0.2-0.1, Math.random()*0.1, 100+Math.random(), 100+Math.random()]);
+    const res = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lob_snapshot })
+    });
+    const data = await res.json();
+    out.textContent = JSON.stringify(data, null, 2);
+  } catch (e) {
+    out.textContent = 'Error: ' + e.message;
+  }
+}
+</script>
 </section>
 <!-- Pipeline Visualization -->
-<section id="documentation" class="max-w-7xl mx-auto w-full">
-<h2 class="text-title-sm font-semibold text-on-surface mb-4">Architecture Pipeline</h2>
-<div class="bg-surface-container border border-surface-container-highest p-6 rounded-DEFAULT overflow-x-auto">
-<div class="flex flex-col md:flex-row items-center justify-between min-w-[800px]">
-<!-- Step 1 -->
-<div class="flex flex-col items-center gap-2 group tooltip">
-<div class="w-12 h-12 rounded-full border border-primary bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-surface transition-colors">
-<span class="font-data-mono font-bold">01</span>
-</div>
-<span class="text-body-sm font-medium text-on-surface-variant whitespace-nowrap">Synthetic LOB</span>
-<span class="tooltiptext">Data generation mimicking L2 order book dynamics.</span>
-</div>
-<div class="flow-line"></div>
-<!-- Step 2 -->
-<div class="flex flex-col items-center gap-2 group tooltip">
-<div class="w-12 h-12 rounded-full border border-primary bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-surface transition-colors">
-<span class="font-data-mono font-bold">02</span>
-</div>
-<span class="text-body-sm font-medium text-on-surface-variant whitespace-nowrap">Feature Eng</span>
-<span class="tooltiptext">Extracting WOFI, spread, imbalances.</span>
-</div>
-<div class="flow-line"></div>
-<!-- Step 3 -->
-<div class="flex flex-col items-center gap-2 group tooltip">
-<div class="w-12 h-12 rounded-full border border-secondary bg-secondary/10 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-surface transition-colors">
-<span class="font-data-mono font-bold">03</span>
-</div>
-<span class="text-body-sm font-medium text-on-surface-variant whitespace-nowrap">LOBTransformer</span>
-<span class="tooltiptext">Deep attention network for temporal patterns.</span>
-</div>
-<div class="flow-line"></div>
-<!-- Step 4 -->
-<div class="flex flex-col items-center gap-2 group tooltip">
-<div class="w-12 h-12 rounded-full border border-tertiary bg-tertiary/10 flex items-center justify-center text-tertiary group-hover:bg-tertiary group-hover:text-surface transition-colors">
-<span class="font-data-mono font-bold">04</span>
-</div>
-<span class="text-body-sm font-medium text-on-surface-variant whitespace-nowrap">Regime HMM</span>
-<span class="tooltiptext">Contextualizing based on market regime.</span>
-</div>
-<div class="flow-line"></div>
-<!-- Step 5 -->
-<div class="flex flex-col items-center gap-2 group tooltip">
-<div class="w-12 h-12 rounded-full border border-primary bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-surface transition-colors">
-<span class="font-data-mono font-bold">05</span>
-</div>
-<span class="text-body-sm font-medium text-on-surface-variant whitespace-nowrap">WF Backtest</span>
-<span class="tooltiptext">Walk-forward validation without look-ahead bias.</span>
-</div>
-<div class="flow-line"></div>
-<!-- Step 6 -->
-<div class="flex flex-col items-center gap-2 group tooltip">
-<div class="w-12 h-12 rounded-full border border-secondary bg-secondary/10 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-surface transition-colors">
-<span class="font-data-mono font-bold">06</span>
-</div>
-<span class="text-body-sm font-medium text-on-surface-variant whitespace-nowrap">ONNX Deploy</span>
-<span class="tooltiptext">Low-latency inference via ONNX runtime.</span>
-</div>
-</div>
-</div>
+<!-- PROFESSIONAL PIPELINE SECTION -->
+<section id="pipeline" class="max-w-7xl mx-auto w-full px-6 py-16">
+    <div class="text-center mb-10">
+        <h2 class="text-3xl font-bold text-white mb-2">End-to-End Pipeline</h2>
+        <p class="text-gray-400 text-sm">From synthetic data generation to sub-15ms production inference</p>
+    </div>
+
+    <!-- Desktop: Horizontal Flow | Mobile: Vertical Stack -->
+    <div class="relative">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-4">
+
+            <!-- STEP 01 -->
+            <div class="group cursor-pointer relative" onclick="togglePipeline(1)">
+                <div class="hidden md:block absolute top-7 left-[50%] w-full h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-40 z-0"></div>
+                <div class="flex flex-col items-center text-center relative z-10">
+                    <div class="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/50 group-hover:scale-110 transition-all duration-300 border border-blue-400/40 ring-2 ring-transparent group-hover:ring-blue-400/30">
+                        <span class="group-hover:hidden">01</span>
+                        <svg class="w-6 h-6 hidden group-hover:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div class="mt-3">
+                        <h3 class="text-white font-semibold text-sm group-hover:text-blue-400 transition-colors">Synthetic LOB</h3>
+                        <p class="text-gray-500 text-xs mt-0.5">Data Generation</p>
+                    </div>
+                    <div class="mt-2 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-[10px] font-bold tracking-wider">COMPLETED</div>
+                </div>
+                <div id="pipe-1" class="hidden mt-3 p-3 bg-gray-800/60 rounded-lg border border-gray-700/50 text-xs text-gray-300 space-y-1 text-left relative z-10">
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> 5M synthetic ticks</div>
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> OU mean-reversion</div>
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> Volume microstructure</div>
+                </div>
+            </div>
+
+            <!-- STEP 02 -->
+            <div class="group cursor-pointer relative" onclick="togglePipeline(2)">
+                <div class="hidden lg:block absolute top-7 left-[50%] w-full h-0.5 bg-gradient-to-r from-indigo-500 to-emerald-500 opacity-40 z-0"></div>
+                <div class="flex flex-col items-center text-center relative z-10">
+                    <div class="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/50 group-hover:scale-110 transition-all duration-300 border border-indigo-400/40 ring-2 ring-transparent group-hover:ring-indigo-400/30">
+                        <span class="group-hover:hidden">02</span>
+                        <svg class="w-6 h-6 hidden group-hover:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div class="mt-3">
+                        <h3 class="text-white font-semibold text-sm group-hover:text-indigo-400 transition-colors">Feature Eng</h3>
+                        <p class="text-gray-500 text-xs mt-0.5">WOFI · Hawkes · Kyle</p>
+                    </div>
+                    <div class="mt-2 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-[10px] font-bold tracking-wider">COMPLETED</div>
+                </div>
+                <div id="pipe-2" class="hidden mt-3 p-3 bg-gray-800/60 rounded-lg border border-gray-700/50 text-xs text-gray-300 space-y-1 text-left relative z-10">
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> WOFI (order flow imbalance)</div>
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> Hawkes intensity</div>
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> Kyle's Lambda</div>
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> Amihud ILLIQ</div>
+                </div>
+            </div>
+
+            <!-- STEP 03 -->
+            <div class="group cursor-pointer relative" onclick="togglePipeline(3)">
+                <div class="hidden md:block absolute top-7 left-[50%] w-full h-0.5 bg-gradient-to-r from-emerald-500 to-amber-500 opacity-40 z-0"></div>
+                <div class="flex flex-col items-center text-center relative z-10">
+                    <div class="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/50 group-hover:scale-110 transition-all duration-300 border border-emerald-400/40 ring-2 ring-transparent group-hover:ring-emerald-400/30">
+                        <span class="group-hover:hidden">03</span>
+                        <svg class="w-6 h-6 hidden group-hover:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div class="mt-3">
+                        <h3 class="text-white font-semibold text-sm group-hover:text-emerald-400 transition-colors">LOBTransformer</h3>
+                        <p class="text-gray-500 text-xs mt-0.5">6-Layer · 8 Heads</p>
+                    </div>
+                    <div class="mt-2 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-[10px] font-bold tracking-wider">COMPLETED</div>
+                </div>
+                <div id="pipe-3" class="hidden mt-3 p-3 bg-gray-800/60 rounded-lg border border-gray-700/50 text-xs text-gray-300 space-y-1 text-left relative z-10">
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> 51.25% Val Acc</div>
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> Kendall uncertainty</div>
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> Multi-task heads</div>
+                </div>
+            </div>
+
+            <!-- STEP 04 -->
+            <div class="group cursor-pointer relative" onclick="togglePipeline(4)">
+                <div class="hidden lg:block absolute top-7 left-[50%] w-full h-0.5 bg-gradient-to-r from-amber-500 to-violet-500 opacity-40 z-0"></div>
+                <div class="flex flex-col items-center text-center relative z-10">
+                    <div class="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-amber-500/20 group-hover:shadow-amber-500/50 group-hover:scale-110 transition-all duration-300 border border-amber-400/40 ring-2 ring-transparent group-hover:ring-amber-400/30">
+                        <span class="group-hover:hidden">04</span>
+                        <svg class="w-6 h-6 hidden group-hover:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div class="mt-3">
+                        <h3 class="text-white font-semibold text-sm group-hover:text-amber-400 transition-colors">Regime HMM</h3>
+                        <p class="text-gray-500 text-xs mt-0.5">3-State Gaussian</p>
+                    </div>
+                    <div class="mt-2 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-[10px] font-bold tracking-wider">COMPLETED</div>
+                </div>
+                <div id="pipe-4" class="hidden mt-3 p-3 bg-gray-800/60 rounded-lg border border-gray-700/50 text-xs text-gray-300 space-y-1 text-left relative z-10">
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> TRENDING regime</div>
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> MEAN_REVERTING</div>
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> VOLATILE</div>
+                </div>
+            </div>
+
+            <!-- STEP 05 -->
+            <div class="group cursor-pointer relative" onclick="togglePipeline(5)">
+                <div class="hidden md:block absolute top-7 left-[50%] w-full h-0.5 bg-gradient-to-r from-violet-500 to-rose-500 opacity-40 z-0"></div>
+                <div class="flex flex-col items-center text-center relative z-10">
+                    <div class="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/50 group-hover:scale-110 transition-all duration-300 border border-violet-400/40 ring-2 ring-transparent group-hover:ring-violet-400/30">
+                        <span class="group-hover:hidden">05</span>
+                        <svg class="w-6 h-6 hidden group-hover:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div class="mt-3">
+                        <h3 class="text-white font-semibold text-sm group-hover:text-violet-400 transition-colors">WF Backtest</h3>
+                        <p class="text-gray-500 text-xs mt-0.5">Walk-Forward OOS</p>
+                    </div>
+                    <div class="mt-2 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-[10px] font-bold tracking-wider">COMPLETED</div>
+                </div>
+                <div id="pipe-5" class="hidden mt-3 p-3 bg-gray-800/60 rounded-lg border border-gray-700/50 text-xs text-gray-300 space-y-1 text-left relative z-10">
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> 3 expanding windows</div>
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> Causal daily vol</div>
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> 51.3% OOS accuracy</div>
+                </div>
+            </div>
+
+            <!-- STEP 06 -->
+            <div class="group cursor-pointer relative" onclick="togglePipeline(6)">
+                <div class="flex flex-col items-center text-center relative z-10">
+                    <div class="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500 to-rose-700 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-rose-500/20 group-hover:shadow-rose-500/50 group-hover:scale-110 transition-all duration-300 border border-rose-400/40 ring-2 ring-transparent group-hover:ring-rose-400/30">
+                        <span class="group-hover:hidden">06</span>
+                        <svg class="w-6 h-6 hidden group-hover:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div class="mt-3">
+                        <h3 class="text-white font-semibold text-sm group-hover:text-rose-400 transition-colors">ONNX Deploy</h3>
+                        <p class="text-gray-500 text-xs mt-0.5">p99: 5.47ms</p>
+                    </div>
+                    <div class="mt-2 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-[10px] font-bold tracking-wider">LIVE</div>
+                </div>
+                <div id="pipe-6" class="hidden mt-3 p-3 bg-gray-800/60 rounded-lg border border-gray-700/50 text-xs text-gray-300 space-y-1 text-left">
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> ONNX Runtime</div>
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> FastAPI</div>
+                    <div class="flex items-center gap-2"><span class="text-green-400">✓</span> Hugging Face Spaces</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </section>
+
+<script>
+function togglePipeline(n) {
+    const el = document.getElementById('pipe-' + n);
+    const all = document.querySelectorAll('[id^="pipe-"]');
+    all.forEach(d => { if (d !== el) d.classList.add('hidden'); });
+    el.classList.toggle('hidden');
+}
+</script>
 <!-- Interactive API Documentation -->
 <section class="max-w-7xl mx-auto w-full space-y-6" id="api">
-<h2 class="text-title-sm font-semibold text-on-surface">API Documentation &amp; Sandbox</h2>
+<h2 class="text-2xl font-bold text-white mb-6">API Documentation &amp; Sandbox</h2>
+
 <!-- /health -->
-<div class="bg-surface-container border border-surface-container-highest p-6 rounded-DEFAULT">
-<div class="flex items-center gap-3 mb-4">
-<span class="px-2 py-1 bg-secondary/20 text-secondary font-bold text-xs rounded">GET</span>
-<h3 class="text-body-md font-bold text-on-surface font-data-mono">/health</h3>
+<div class="border border-gray-700 rounded-lg bg-gray-800/30 p-6">
+  <div class="flex items-center gap-3 mb-3">
+    <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold">GET</span>
+    <h3 class="text-white font-semibold">/health</h3>
+  </div>
+  <p class="text-sm text-gray-400 mb-4">Check API and model readiness.</p>
+  
+  <div class="relative group mb-4">
+    <pre id="curl-health" class="text-xs bg-black/50 p-3 rounded border border-gray-700 font-mono text-blue-300 whitespace-pre-wrap break-all">curl -X GET https://hemanthnaidug-alphalob.hf.space/health</pre>
+    <button onclick="copyToClipboard('curl-health')" class="absolute top-2 right-2 px-2 py-1 rounded bg-gray-700 hover:bg-gray-600 text-xs text-gray-300 opacity-0 group-hover:opacity-100 transition">Copy</button>
+  </div>
+  
+  <button onclick="testHealth()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded text-white text-sm font-medium transition flex items-center gap-2">
+    <span>▶</span> Ping API
+  </button>
+  
+  <div id="health-output" class="mt-4 hidden">
+    <div class="flex items-center gap-2 mb-2">
+      <span id="health-status" class="px-2 py-0.5 rounded text-xs font-bold bg-gray-700 text-gray-300">--</span>
+      <span id="health-latency" class="text-xs text-gray-500 font-mono">0ms</span>
+    </div>
+    <pre id="health-json" class="text-xs bg-black/70 p-3 rounded border border-gray-700 font-mono text-green-400 overflow-x-auto"></pre>
+  </div>
 </div>
-<p class="text-body-sm text-on-surface-variant mb-4">Check API and model readiness.</p>
-<div class="bg-surface p-4 rounded-DEFAULT border border-outline-variant mb-4 font-data-mono text-sm overflow-x-auto">
-<code class="text-primary" id="curl-health">curl -X GET https://hemanthnaidug-alphalob.hf.space/health</code>
-</div>
-<div class="flex gap-4">
-<button class="px-4 py-2 bg-primary/10 border border-primary text-primary rounded-DEFAULT hover:bg-primary/20 transition-colors font-medium text-sm flex items-center gap-2" onclick="testHealth()">
-<span class="material-symbols-outlined text-sm">play_arrow</span> Test
-                </button>
-</div>
-<div class="hidden mt-4" id="health-result-container">
-<pre class="bg-surface p-4 rounded-DEFAULT border border-outline-variant text-xs font-data-mono text-on-surface overflow-x-auto" id="health-result"></pre>
-</div>
-</div>
+
 <!-- /predict -->
-<div class="bg-surface-container border border-surface-container-highest p-6 rounded-DEFAULT">
-<div class="flex items-center gap-3 mb-4">
-<span class="px-2 py-1 bg-primary/20 text-primary font-bold text-xs rounded">POST</span>
-<h3 class="text-body-md font-bold text-on-surface font-data-mono">/predict</h3>
+<div class="border border-gray-700 rounded-lg bg-gray-800/30 p-6">
+  <div class="flex items-center gap-3 mb-3">
+    <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 text-xs font-bold">POST</span>
+    <h3 class="text-white font-semibold">/predict</h3>
+  </div>
+  <p class="text-sm text-gray-400 mb-4">Generate alpha signals from a 10-level LOB snapshot. Returns directional probabilities + spread/vol signals.</p>
+  
+  <div class="relative group mb-4">
+    <pre id="curl-predict" class="text-xs bg-black/50 p-3 rounded border border-gray-700 font-mono text-blue-300 whitespace-pre-wrap break-all">
+curl -X POST https://hemanthnaidug-alphalob.hf.space/predict \
+  -H "Content-Type: application/json" \
+  -d '{"lob_snapshot": [
+    [0.0, 1.2, 0.5, 0.3],
+    [0.0, 1.1, 0.5, 0.3],
+    [0.0, 1.0, 0.5, 0.3],
+    [0.0, 0.9, 0.5, 0.3],
+    [0.0, 0.8, 0.5, 0.3],
+    [0.0, 0.7, 0.5, 0.3],
+    [0.0, 0.6, 0.5, 0.3],
+    [0.0, 0.5, 0.5, 0.3],
+    [0.0, 0.4, 0.5, 0.3],
+    [0.0, 0.3, 0.5, 0.3]
+  ]}'</pre>
+    <button onclick="copyToClipboard('curl-predict')" class="absolute top-2 right-2 px-2 py-1 rounded bg-gray-700 hover:bg-gray-600 text-xs text-gray-300 opacity-0 group-hover:opacity-100 transition">Copy</button>
+  </div>
+  
+  <button onclick="testPredict()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded text-white text-sm font-medium transition flex items-center gap-2">
+    <span>▶</span> Send Request
+  </button>
+  
+  <div id="predict-output" class="mt-4 hidden">
+    <div class="flex items-center gap-2 mb-2">
+      <span id="predict-status" class="px-2 py-0.5 rounded text-xs font-bold bg-gray-700 text-gray-300">--</span>
+      <span id="predict-latency" class="text-xs text-gray-500 font-mono">0ms</span>
+    </div>
+    <pre id="predict-json" class="text-xs bg-black/70 p-3 rounded border border-gray-700 font-mono text-green-400 overflow-x-auto"></pre>
+  </div>
 </div>
-<p class="text-body-sm text-on-surface-variant mb-4">Generate alpha signals from order book features. Requires a sequence of 10 timesteps with 4 features (WOFI, spread, microprice_mid, vwap_mid).</p>
-<div class="bg-surface p-4 rounded-DEFAULT border border-outline-variant mb-4 font-data-mono text-sm overflow-x-auto whitespace-pre">
-<code class="text-primary">curl -X POST https://hemanthnaidug-alphalob.hf.space/predict \
--H "Content-Type: application/json" \
--d '{"lob_snapshot": [[0.0,1.2,0.5,0.3], ... (10 steps) ]}'</code>
-</div>
-<div class="flex gap-4">
-<button class="px-4 py-2 bg-primary/10 border border-primary text-primary rounded-DEFAULT hover:bg-primary/20 transition-colors font-medium text-sm flex items-center gap-2" onclick="testPredict()">
-<span class="material-symbols-outlined text-sm">play_arrow</span> Try It
-                </button>
-</div>
-<div class="hidden mt-4" id="predict-result-container">
-<pre class="bg-surface p-4 rounded-DEFAULT border border-outline-variant text-xs font-data-mono text-on-surface overflow-x-auto" id="predict-result"></pre>
-</div>
-</div>
+
 <!-- /regime -->
-<div class="bg-surface-container border border-surface-container-highest p-6 rounded-DEFAULT">
-<div class="flex items-center gap-3 mb-4">
-<span class="px-2 py-1 bg-primary/20 text-primary font-bold text-xs rounded">POST</span>
-<h3 class="text-body-md font-bold text-on-surface font-data-mono">/regime</h3>
-</div>
-<p class="text-body-sm text-on-surface-variant mb-4">Determine market regime using HMM.</p>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-<div>
-<label class="block text-label-caps text-on-surface-variant mb-1">Realized Volatility</label>
-<input class="w-full bg-surface border border-outline-variant rounded-DEFAULT px-3 py-2 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none" id="input-vol" step="0.01" type="number" value="0.015"/>
-</div>
-<div>
-<label class="block text-label-caps text-on-surface-variant mb-1">Autocorrelation</label>
-<input class="w-full bg-surface border border-outline-variant rounded-DEFAULT px-3 py-2 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none" id="input-auto" step="0.01" type="number" value="-0.1"/>
-</div>
-</div>
-<div class="flex gap-4">
-<button class="px-4 py-2 bg-primary/10 border border-primary text-primary rounded-DEFAULT hover:bg-primary/20 transition-colors font-medium text-sm flex items-center gap-2" onclick="testRegime()">
-<span class="material-symbols-outlined text-sm">play_arrow</span> Run Inference
-                </button>
-</div>
-<div class="hidden mt-4" id="regime-result-container">
-<pre class="bg-surface p-4 rounded-DEFAULT border border-outline-variant text-xs font-data-mono text-on-surface overflow-x-auto" id="regime-result"></pre>
-</div>
+<div class="border border-gray-700 rounded-lg bg-gray-800/30 p-6">
+  <div class="flex items-center gap-3 mb-3">
+    <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 text-xs font-bold">POST</span>
+    <h3 class="text-white font-semibold">/regime</h3>
+  </div>
+  <p class="text-sm text-gray-400 mb-4">Determine market regime using HMM.</p>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+    <div>
+      <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Realized Volatility</label>
+      <input class="w-full bg-black/50 border border-gray-700 rounded p-2 text-sm text-blue-300 font-mono focus:border-amber-500 outline-none" id="input-vol" step="0.01" type="number" value="0.015"/>
+    </div>
+    <div>
+      <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Autocorrelation</label>
+      <input class="w-full bg-black/50 border border-gray-700 rounded p-2 text-sm text-blue-300 font-mono focus:border-amber-500 outline-none" id="input-auto" step="0.01" type="number" value="-0.1"/>
+    </div>
+  </div>
+  <p class="text-xs text-gray-500 mb-4 italic">(Hint: Try Volatility &lt; 0.0018 for Volatile, 0.005 for Trending, and &gt; 0.009 for Mean-Reverting)</p>
+  
+  <div class="relative group mb-4">
+    <pre id="curl-regime" class="text-xs bg-black/50 p-3 rounded border border-gray-700 font-mono text-blue-300 whitespace-pre-wrap break-all">
+curl -X POST https://hemanthnaidug-alphalob.hf.space/regime \
+  -H "Content-Type: application/json" \
+  -d '{"realized_vol": 0.015, "autocorrelation": -0.1}'</pre>
+    <button onclick="copyToClipboard('curl-regime')" class="absolute top-2 right-2 px-2 py-1 rounded bg-gray-700 hover:bg-gray-600 text-xs text-gray-300 opacity-0 group-hover:opacity-100 transition">Copy</button>
+  </div>
+  
+  <button onclick="testRegime()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded text-white text-sm font-medium transition flex items-center gap-2">
+    <span>▶</span> Detect Regime
+  </button>
+  
+  <div id="regime-output" class="mt-4 hidden">
+    <div class="flex items-center gap-2 mb-2">
+      <span id="regime-status" class="px-2 py-0.5 rounded text-xs font-bold bg-gray-700 text-gray-300">--</span>
+      <span id="regime-latency" class="text-xs text-gray-500 font-mono">0ms</span>
+    </div>
+    <pre id="regime-json" class="text-xs bg-black/70 p-3 rounded border border-gray-700 font-mono text-green-400 overflow-x-auto"></pre>
+  </div>
 </div>
 </section>
 </main>
-<!-- Footer (Generated from JSON) -->
-<footer class="bg-surface-container-low dark:bg-surface-container-low border-t border-outline-variant dark:border-outline-variant flat no shadows w-full px-container-margin py-stack-default flex flex-col md:flex-row justify-between items-center gap-stack-default mt-auto">
-<div class="text-body-sm font-body-sm text-primary dark:text-primary">
-            Built by Hemanth Naidu | 4th Year CSE | Quantitative Finance &amp; Deep Learning
-        </div>
-<div class="flex items-center gap-container-margin">
-<a class="text-label-caps font-label-caps text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface transition-colors" href="https://github.com/GokavalasaHemanthNaidu/AlphaLOB" target="_blank">GitHub</a>
-<a class="text-label-caps font-label-caps text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface transition-colors" href="https://hemanthnaidug-alphalob.hf.space" target="_blank">Hugging Face Space</a>
-</div>
+<!-- Footer -->
+<footer class="mt-16 pt-8 pb-8 border-t border-gray-800 text-center text-sm text-gray-500 w-full px-4">
+  <p>Built by <strong class="text-gray-300">Hemanth Naidu Gokavalasa</strong> · Dual Degree(B Tech + M Tech) in Mathematics and Computing Technology · National Institute of Technology Patna</p>
+  <div class="mt-2 space-x-4">
+    <a href="https://github.com/GokavalasaHemanthNaidu/AlphaLOB" class="text-blue-400 hover:underline">GitHub</a>
+    <a href="https://hemanthnaidug-alphalob.hf.space" class="text-blue-400 hover:underline">Hugging Face</a>
+  </div>
 </footer>
 <script>
         // API Interactions
         const API_BASE = 'https://hemanthnaidug-alphalob.hf.space';
 
-        function showLoading(elementId) {
-            const container = document.getElementById(elementId + '-container');
-            const resultEl = document.getElementById(elementId);
-            container.classList.remove('hidden');
-            resultEl.innerHTML = '<span class="animate-pulse">Executing request...</span>';
-            resultEl.className = 'bg-surface p-4 rounded-DEFAULT border border-outline-variant text-xs font-data-mono text-outline overflow-x-auto';
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent.trim();
+            navigator.clipboard.writeText(text);
         }
 
-        function showResult(elementId, data, isError = false) {
-            const resultEl = document.getElementById(elementId);
-            resultEl.innerHTML = JSON.stringify(data, null, 2);
-            if (isError) {
-                resultEl.className = 'bg-error/10 p-4 rounded-DEFAULT border border-error text-xs font-data-mono text-error overflow-x-auto';
-            } else {
-                resultEl.className = 'bg-surface p-4 rounded-DEFAULT border border-outline-variant text-xs font-data-mono text-secondary overflow-x-auto';
-            }
-        }
-
-        async function testHealth() {
-            showLoading('health-result');
+        window.addEventListener('DOMContentLoaded', async () => {
             try {
-                const response = await fetch(`${API_BASE}/health`);
-                const data = await response.json();
-                if (!response.ok) { throw new Error(JSON.stringify(data)); }
-                showResult('health-result', data);
-            } catch (error) {
-                showResult('health-result', { error: error.message }, true);
+                const res = await fetch('/health', { signal: AbortSignal.timeout(3000) });
+                if (!res.ok) throw new Error('Not OK');
+                const statusEl = document.getElementById('api-status');
+                statusEl.classList.remove('text-amber-400');
+                statusEl.classList.add('text-emerald-400');
+                statusEl.textContent = '● API Online';
+            } catch {
+                const statusEl = document.getElementById('api-status');
+                statusEl.classList.add('text-amber-400');
+                statusEl.textContent = '● Waking up...';
+            }
+        });
+
+        async function executeRequest(endpoint, outputPrefix, fetchArgs = {}) {
+            const out = document.getElementById(`${outputPrefix}-output`);
+            const status = document.getElementById(`${outputPrefix}-status`);
+            const latency = document.getElementById(`${outputPrefix}-latency`);
+            const json = document.getElementById(`${outputPrefix}-json`);
+            
+            out.classList.remove('hidden');
+            status.textContent = 'LOADING';
+            status.className = 'px-2 py-0.5 rounded text-xs font-bold bg-yellow-500/20 text-yellow-400';
+            json.textContent = 'Waiting for response...';
+            
+            const t0 = performance.now();
+            try {
+                const res = await fetch(API_BASE + endpoint, fetchArgs);
+                const ms = Math.round(performance.now() - t0);
+                
+                status.textContent = res.status;
+                status.className = res.ok 
+                    ? 'px-2 py-0.5 rounded text-xs font-bold bg-emerald-500/20 text-emerald-400'
+                    : 'px-2 py-0.5 rounded text-xs font-bold bg-red-500/20 text-red-400';
+                latency.textContent = `${ms}ms`;
+                
+                const data = await res.json();
+                json.textContent = JSON.stringify(data, null, 2);
+            } catch (e) {
+                status.textContent = 'ERR';
+                status.className = 'px-2 py-0.5 rounded text-xs font-bold bg-red-500/20 text-red-400';
+                latency.textContent = '--';
+                json.textContent = `Error: ${e.message}\n\nIf the Space was asleep, wait 3 seconds and retry.`;
             }
         }
 
-        async function testPredict() {
-            showLoading('predict-result');
-            
-            // Dummy 10x4 feature matrix
+        function testHealth() {
+            executeRequest('/health', 'health');
+        }
+
+        function testPredict() {
             const lob_snapshot = Array.from({length: 10}, () => 
                 [Math.random() * 0.2 - 0.1, Math.random() * 0.1, 100 + Math.random(), 100 + Math.random()]
             );
-
-            try {
-                const response = await fetch(`${API_BASE}/predict`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ lob_snapshot })
-                });
-                const data = await response.json();
-                if (!response.ok) { throw new Error(JSON.stringify(data)); }
-                showResult('predict-result', data);
-            } catch (error) {
-                showResult('predict-result', { error: error.message }, true);
-            }
+            executeRequest('/predict', 'predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lob_snapshot })
+            });
         }
 
-        async function testRegime() {
-            showLoading('regime-result');
-            
+        function testRegime() {
             const vol = parseFloat(document.getElementById('input-vol').value);
             const auto = parseFloat(document.getElementById('input-auto').value);
-
-            try {
-                const response = await fetch(`${API_BASE}/regime`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ realized_vol: vol, autocorrelation: auto })
-                });
-                const data = await response.json();
-                if (!response.ok) { throw new Error(JSON.stringify(data)); }
-                showResult('regime-result', data);
-            } catch (error) {
-                showResult('regime-result', { error: error.message }, true);
-            }
+            executeRequest('/regime', 'regime', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ realized_vol: vol, autocorrelation: auto })
+            });
         }
     </script>
 </body></html>
