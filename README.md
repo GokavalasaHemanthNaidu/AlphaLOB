@@ -41,6 +41,7 @@
 - [🛠️ Tech Stack](#️-tech-stack)
 - [🎯 Design Decisions](#-design-decisions)
 - [🗺️ Roadmap](#️-roadmap)
+- [🧯 VS Code Chat Model Error](#-vs-code-chat-model-error)
 
 ---
 
@@ -717,6 +718,21 @@ DuckDB is an **embedded analytical database** — it runs inside the Python proc
 🔜 Phase 8  Tick-level data (upgrade from snapshot LOB)
 🔜 Phase 9  Federated multi-exchange signal fusion
 ```
+
+---
+
+## 🧯 VS Code Chat Model Error
+
+If VS Code chat shows this on every message:
+
+> `400 Model 'moonshotai/kimi-k2' is not in the catalog. Use 'auto' (or omit the 'model' field) ...`
+
+it means your chat client is pinned to a model that your provider does not expose anymore.
+
+Quick fix:
+- In your chat/client config, set `model` to `auto` (or remove the `model` field).
+- If your extension keeps old state, reload VS Code after saving config.
+- If needed, query your provider's `/v1/models` endpoint and pick only a listed model.
 
 ---
 
