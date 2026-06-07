@@ -5,12 +5,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          lfs: true
       - name: Install Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
       - name: Install audit tools
-        run: pip install bandit pip-audit pytest pytest-cov httpx polars fastapi uvicorn onnxruntime joblib duckdb
+        run: pip install bandit pip-audit pytest pytest-cov httpx polars fastapi uvicorn onnxruntime joblib duckdb hmmlearn
       - name: Run Pytest Unit Tests
         run: pytest tests/unit/ -v
       - name: Run Bandit SAST
