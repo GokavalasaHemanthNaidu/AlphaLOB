@@ -3,7 +3,7 @@
 <a href="https://github.com/GokavalasaHemanthNaidu/AlphaLOB"><img src="https://img.shields.io/badge/AlphaLOB-HFT%20AI%20Engine-blueviolet?style=for-the-badge&logo=lightning&logoColor=white" height="40"/></a>
 
 # ⚡ AlphaLOB
-### Real-Time High-Frequency Trading AI — Limit Order Book Signal Engine
+### Low-Latency HFT Signal Engine (Simulation & Inference Framework)
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg?style=flat-square&logo=python)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=flat-square&logo=PyTorch&logoColor=white)](https://pytorch.org/)
@@ -21,6 +21,19 @@
 *An end-to-end ML system that reads the live heartbeat of a financial market and predicts — in milliseconds — whether the next price move will be UP, DOWN, or FLAT.*
 
 </div>
+
+---
+
+## 📚 Comprehensive Documentation
+
+For recruiters, engineers, or AI agents looking to fully understand this project from scratch, the complete architecture and build process is meticulously documented in the [`/docs`](docs/) folder:
+
+- [Product Requirements Document (PRD)](docs/PRD.md)
+- [Technical Requirements Document (TRD)](docs/TRD.md)
+- [Backend Schema Document](docs/BackendSchema.md)
+- [UI/UX Design Brief](docs/UIUXBrief.md)
+- [App Flow Document](docs/AppFlow.md)
+- [Implementation Plan](docs/ImplementationPlan.md)
 
 ---
 
