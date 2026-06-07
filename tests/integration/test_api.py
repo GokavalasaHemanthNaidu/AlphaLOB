@@ -50,4 +50,4 @@ def test_root_demo_endpoint():
     response = client.get("/")
     assert response.status_code == 200
     assert "text/html" in response.headers["content-type"]
-    assert "AlphaLOB Real-Time Dashboard" in response.text
+    assert "AlphaLOB | Low-Latency" in response.text

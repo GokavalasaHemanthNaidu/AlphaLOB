@@ -50,3 +50,7 @@ htmlcov/
 
 # MyPy
 .mypy_cache/
+
+*.pyc
+*.bin
+*.onnx

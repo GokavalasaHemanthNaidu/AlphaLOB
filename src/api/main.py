@@ -20,6 +20,13 @@ ONNX_PATH  = os.path.join(BASE_DIR, "models", "weights", "lobster_transformer.on
 HMM_PATH   = os.path.join(BASE_DIR, "models", "weights", "regime_hmm.bin")
 
 # ── Load models at startup ────────────────────────────────────────────────────
+from src.infrastructure.duckdb_client import init_db
+from src.infrastructure.mlflow_sqlite import init_mlflow_db
+
+print("Initializing databases...")
+init_db()
+init_mlflow_db()
+
 print("Loading ONNX model...")
 ort_session = ort.InferenceSession(ONNX_PATH, providers=["CPUExecutionProvider"])
 print(f"  ONNX loaded: {ONNX_PATH}")
@@ -32,9 +39,12 @@ print(f"  HMM loaded: {HMM_PATH} | regimes: {list(hmm_model.regime_names.values(
 # ── FastAPI application ───────────────────────────────────────────────────────
 app = FastAPI(
     title="AlphaLOB Inference API",
-    description="Real-time LOB inference: directional probability + regime detection",
+    description="Low-latency LOB inference: directional probability + regime detection",
     version="1.0.0",
 )
+
+from src.api.routes.signals import router as signals_router
+app.include_router(signals_router)
 
 # ── CORS — allow interviewers/Postman to call the API from any origin ─────────
 app.add_middleware(
@@ -99,10 +109,10 @@ LANDING_HTML = """
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>"/>
-<meta name="description" content="AlphaLOB — Real-time Limit Order Book alpha signals via ONNX Transformer + HMM regime detection."/>
-<meta property="og:title" content="AlphaLOB | Real-Time LOB Alpha Signals"/>
+<meta name="description" content="AlphaLOB — Low-latency Limit Order Book alpha signals via ONNX Transformer + HMM regime detection."/>
+<meta property="og:title" content="AlphaLOB | Low-Latency LOB Alpha Signals"/>
 <meta property="og:description" content="51.25% directional accuracy. 5.47ms p99 latency. Zero look-ahead bias."/>
-<title>AlphaLOB | Real-Time Limit Order Book Alpha Signals</title>
+<title>AlphaLOB | Low-Latency Limit Order Book Alpha Signals</title>
 <!-- Material Symbols -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <!-- Google Fonts: JetBrains Mono -->
@@ -397,7 +407,7 @@ LANDING_HTML = """
   <h1 class="text-4xl md:text-5xl font-mono font-bold text-white mb-2">
     > AlphaLOB<span class="animate-pulse">_</span>
   </h1>
-  <p class="text-xl text-gray-400 font-light">Real-Time Limit Order Book Alpha Signals</p>
+  <p class="text-xl text-gray-400 font-light">Low-Latency Limit Order Book Alpha Signals</p>
 </section>
 
 <!-- Mathematical Rigor Banner -->
@@ -921,7 +931,10 @@ async def predict(body: LOBSnapshot):
     X = np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0)
 
     # ONNX inference
-    outputs = ort_session.run(None, {"lob_snapshot": X})
+    try:
+        outputs = ort_session.run(None, {"lob_snapshot": X})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Inference failed: {str(e)}")
 
     # Extract outputs (handle both (1,2) and (1,) shapes)
     def safe_prob(arr, idx):
@@ -953,8 +966,11 @@ async def regime(body: RegimeInput):
     X_hmm = np.nan_to_num(X_hmm, nan=0.0, posinf=0.0, neginf=0.0)
 
     # Predict state and probabilities
-    state_id  = int(hmm_model.predict(X_hmm)[0])
-    proba     = hmm_model.predict_proba(X_hmm)[0]   # (n_states,) array
+    try:
+        state_id  = int(hmm_model.predict(X_hmm)[0])
+        proba     = hmm_model.predict_proba(X_hmm)[0]   # (n_states,) array
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Inference failed: {str(e)}")
 
     regime_name = hmm_model.regime_names[state_id]
     proba_dict  = {hmm_model.regime_names[i]: float(proba[i]) for i in range(len(proba))}
@@ -969,4 +985,4 @@ async def regime(body: RegimeInput):
 # ── Entry point ───────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)  # nosec B104

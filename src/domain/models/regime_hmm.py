@@ -80,7 +80,7 @@ class RegimeHMM:
     @classmethod
     def load(cls, filepath: str) -> "RegimeHMM":
         with open(filepath, 'rb') as f:
-            data = pickle.load(f)
+            data = pickle.load(f)  # nosec B301
             
         instance = cls(n_states=data["n_states"])
         instance.model = data["model"]

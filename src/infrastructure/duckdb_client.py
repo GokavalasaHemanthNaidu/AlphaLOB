@@ -33,7 +33,7 @@ def init_db():
             model_version VARCHAR,
             latency_ms FLOAT
         )
-    """))
+    """)
     
     # Table: backtest_runs
     conn.execute("""
@@ -51,7 +51,7 @@ def init_db():
             win_rate FLOAT,
             total_trades INTEGER
         )
-    """))
+    """)
     
     # Table: trade_log
     conn.execute("""
@@ -68,7 +68,7 @@ def init_db():
             pnl FLOAT,
             cum_pnl FLOAT
         )
-    """))
+    """)
     conn.close()
     logger.info("Local DuckDB database initialized successfully.")
 
