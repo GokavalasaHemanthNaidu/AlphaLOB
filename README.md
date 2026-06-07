@@ -3,7 +3,7 @@
 <a href="https://github.com/GokavalasaHemanthNaidu/AlphaLOB"><img src="https://img.shields.io/badge/AlphaLOB-HFT%20AI%20Engine-blueviolet?style=for-the-badge&logo=lightning&logoColor=white" height="40"/></a>
 
 # ⚡ AlphaLOB
-### Low-Latency HFT Signal Engine (Simulation & Inference Framework)
+### Low-Latency Limit Order Book Signal Engine
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg?style=flat-square&logo=python)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=flat-square&logo=PyTorch&logoColor=white)](https://pytorch.org/)
@@ -12,7 +12,6 @@
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
 [![DuckDB](https://img.shields.io/badge/DuckDB-FFF000?style=flat-square&logo=duckdb&logoColor=black)](https://duckdb.org/)
 [![HuggingFace](https://img.shields.io/badge/🤗%20Live%20Demo-HuggingFace-yellow?style=flat-square)](https://huggingface.co/spaces/hemanthnaidug/AlphaLOB)
-[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
 **[🚀 Live Demo](https://huggingface.co/spaces/hemanthnaidug/AlphaLOB)** · **[🐛 Issues](https://github.com/GokavalasaHemanthNaidu/AlphaLOB/issues)**
 
@@ -24,39 +23,27 @@
 
 ---
 
-## 📚 Comprehensive Documentation
-
-For recruiters, engineers, or AI agents looking to fully understand this project from scratch, the complete architecture and build process is meticulously documented in the [`/docs`](docs/) folder:
-
-- [Product Requirements Document (PRD)](docs/PRD.md)
-- [Technical Requirements Document (TRD)](docs/TRD.md)
-- [Backend Schema Document](docs/BackendSchema.md)
-- [UI/UX Design Brief](docs/UIUXBrief.md)
-- [App Flow Document](docs/AppFlow.md)
-- [Implementation Plan](docs/ImplementationPlan.md)
-
----
-
 ## 📖 Table of Contents
 
 - [🧩 What Is This? (Layman's Guide)](#-what-is-this-laymans-guide)
-- [🏗️ System Architecture](#️-system-architecture)
+- [🏗️ System Architecture Diagram](#️-system-architecture-diagram)
 - [🔄 Full ML Pipeline](#-full-ml-pipeline)
 - [🧠 Model Architecture](#-model-architecture)
 - [📊 Feature Engineering](#-feature-engineering)
 - [🌊 Market Regime Detection (HMM)](#-market-regime-detection-hmm)
 - [⚡ Low-Latency Inference Stack](#-low-latency-inference-stack)
 - [🌐 API Reference](#-api-reference)
-- [📁 Repository Structure](#-repository-structure)
 - [🚀 Quick Start](#-quick-start)
-- [🐳 Docker Deployment](#-docker-deployment)
-- [📈 MLOps & Drift Monitoring](#-mlops--drift-monitoring)
-- [🛠️ Tech Stack](#️-tech-stack)
+- [📁 Repository Structure](#-repository-structure)
 - [🎯 Design Decisions](#-design-decisions)
+- [📈 MLOps & Drift Monitoring](#-mlops--drift-monitoring)
+- [🛠️ Tech Stack Table](#️-tech-stack-table)
 - [🗺️ Roadmap](#️-roadmap)
+- [📚 Comprehensive Documentation (Docs Folder)](#-comprehensive-documentation-docs-folder)
 
 ---
 
+<a id="-what-is-this-laymans-guide"></a>
 ## 🧩 What Is This? (Layman's Guide)
 
 > **No finance background? No problem. Read this first.**
@@ -65,7 +52,7 @@ Imagine you're watching an eBay auction, but for Bitcoin, and it's happening **m
 
 At any moment, thousands of buyers say *"I'll pay $30,000"* and thousands of sellers say *"I'll sell for $30,005."* The full list of all these open offers — sorted by price — is called a **Limit Order Book (LOB)**.
 
-```
+```text
                     THE LIMIT ORDER BOOK
     ┌─────────────────────────────────────────────┐
     │         SELL ORDERS (Asks)                  │
@@ -86,20 +73,21 @@ At any moment, thousands of buyers say *"I'll pay $30,000"* and thousands of sel
 
 > *"Based on the last N snapshots of buyer/seller pressure — will the price go UP 📈, DOWN 📉, or SIDEWAYS ➡️ in the next 30 seconds?"*
 
-That prediction — called an **alpha signal** — is the core output that hedge funds and trading algorithms use to make buy/sell decisions.
+That prediction — called an **alpha signal** — is the core output that hedge funds and algorithmic trading systems use to execute micro-trades ahead of the market.
 
 ---
 
-## 🏗️ System Architecture
+<a id="️-system-architecture-diagram"></a>
+## 🏗️ System Architecture Diagram
 
-The system is split into two clean environments: a **Cloud Training Phase** and a **Local/Deployed Inference Phase**.
+The system is split into two clean environments: a **Cloud Training Phase** (where massive data is processed) and a **Production Docker Container** (where latency is everything).
 
-```
+```text
 ╔══════════════════════════════════════════════════════════════════════════╗
-║                     ALPHALOB SYSTEM ARCHITECTURE                        ║
+║                     ALPHALOB SYSTEM ARCHITECTURE                         ║
 ╠═══════════════════════════╦══════════════════════════════════════════════╣
 ║  ☁️  CLOUD GPU ENVIRONMENT  ║  🖥️  PRODUCTION INFERENCE SERVER             ║
-║  (Google Colab / Training) ║  (Docker · HuggingFace Spaces)              ║
+║  (Google Colab / Training) ║  (Docker Container)                          ║
 ║                            ║                                              ║
 ║  ┌─────────────────────┐  ║  ┌──────────────────────────────────────┐   ║
 ║  │  Bybit Historical   │  ║  │  Live Data Sources                   │   ║
@@ -134,128 +122,64 @@ The system is split into two clean environments: a **Cloud Training Phase** and 
 ║                            ║  │  FastAPI Application                 │   ║
 ║                            ║  │  · SSE /signals  (streaming)         │   ║
 ║                            ║  │  · REST /predict (snapshot)          │   ║
-║                            ║  │  · /backtest, /health, /docs         │   ║
 ║                            ║  └─────────────────┬────────────────────┘   ║
 ║                            ║                     │                       ║
 ║                            ║                     ▼                       ║
 ║                            ║  ┌──────────────────────────────────────┐   ║
 ║                            ║  │  🌐 Live Web Dashboard               │   ║
-║                            ║  │  Real-time signal stream (SSE)       │   ║
+║                            ║  │  Real-time terminal visualization    │   ║
 ║                            ║  └──────────────────────────────────────┘   ║
 ╚═══════════════════════════╩══════════════════════════════════════════════╝
 ```
 
 ---
 
+<a id="-full-ml-pipeline"></a>
 ## 🔄 Full ML Pipeline
 
-The pipeline is executed across **4 sequential Colab notebooks** in training, then compressed into a single Docker container for production.
+The ML lifecycle is divided into a strict 4-phase sequence.
 
-```
-PHASE 1: DATA & FEATURES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ┌─────────────────┐     ┌──────────────────────┐
- │  Bybit REST API │────▶│  Raw LOB Snapshots   │
- │  BTCUSDT Perp.  │     │  (bid/ask levels 1-5)│
- └─────────────────┘     └──────────┬───────────┘
-                                     │
-                          ┌──────────▼───────────┐
-                          │  Feature Engineering │
-                          │  ▪ Mid-price         │
-                          │  ▪ Bid-Ask Spread    │
-                          │  ▪ Order Imbalance   │
-                          │  ▪ WOFI score        │
-                          │  ▪ Depth ratio       │
-                          │  ▪ Rolling δ volume  │
-                          └──────────┬───────────┘
-                                     │
-                          ┌──────────▼───────────┐
-                          │  Label Generation    │
-                          │  ▪ +1  (UP   >0.02%) │
-                          │  ▪  0  (FLAT ±0.02%) │
-                          │  ▪ -1  (DOWN <0.02%) │
-                          │  Horizons: 5s/30s/5m │
-                          └──────────┬───────────┘
-                                     │
-                          ┌──────────▼───────────┐
-                          │  DuckDB Storage      │
-                          │  alphalob.duckdb     │
-                          └──────────────────────┘
+### Phase 1: Data & Features
+- Pulls Level-2 snapshot order book data (Bids/Asks 1-5) via Bybit REST API.
+- Computes engineered indicators: WOFI, Imbalance, Spread Compression.
+- Maps continuous price changes to strict ternary targets (+1, 0, -1) over 5s/30s/5m horizons.
+- Archives features into an embedded columnar `alphalob.duckdb` database.
 
-PHASE 2: MODEL TRAINING
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ┌─────────────────────────────────────────────────┐
- │           LOB Transformer (PyTorch)             │
- │                                                 │
- │  Input: [Batch × Seq_Len × Features]            │
- │                      │                          │
- │            ┌─────────▼──────────┐               │
- │            │  Linear Embedding  │               │
- │            │  d_model = 64      │               │
- │            └─────────┬──────────┘               │
- │                      │                          │
- │            ┌─────────▼──────────┐               │
- │            │ Positional Encoding│               │
- │            └─────────┬──────────┘               │
- │                      │                          │
- │            ┌─────────▼──────────┐               │
- │            │  Transformer Enc.  │  × N layers   │
- │            │  Multi-Head Attn   │               │
- │            │  FFN + Layer Norm  │               │
- │            └─────────┬──────────┘               │
- │                      │                          │
- │            ┌─────────▼──────────┐               │
- │            │   CLS Token Pool   │               │
- │            └──┬──────┬──────┬───┘               │
- │               │      │      │                   │
- │         ┌─────▼┐  ┌──▼──┐  ┌▼─────┐            │
- │         │Head 1│  │Head2│  │Head 3│            │
- │         │Dir.  │  │Sprd │  │Vol.  │            │
- │         │5s/30s│  │Comp.│  │Imbal.│            │
- │         │/5min │  │     │  │      │            │
- │         └──────┘  └─────┘  └──────┘            │
- └─────────────────────────────────────────────────┘
-              │
-              ▼
- ┌─────────────────────────────────────────────────┐
- │           Export → ONNX Graph                   │
- │   torch.onnx.export(model, ...)                 │
- │   lob_transformer.onnx  (~few MB)               │
- └─────────────────────────────────────────────────┘
+### Phase 2: Model Training
+- Trains a custom PyTorch Transformer Encoder from scratch.
+- Utilizes Multi-Task Learning (predicting direction alongside spread volatility).
+- Traces and exports the dynamic PyTorch graph to an optimized `.onnx` graph.
 
-PHASE 3: BACKTESTING
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- Historical Data ──▶ Backtesting Engine
-                         ▪ Walk-forward simulation
-                         ▪ Sharpe ratio, Max drawdown
-                         ▪ Signal accuracy per horizon
+### Phase 3: Backtesting Engine
+- Reads historical hold-out test sets from DuckDB.
+- Executes walk-forward simulation crossing the bid-ask spread.
+- Generates hard trading metrics: Sharpe Ratio, Max Drawdown, and Win Rate.
 
-PHASE 4: PRODUCTION INFERENCE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- (See System Architecture above)
-```
+### Phase 4: Production Inference
+- Loads the `.onnx` file inside the standalone Docker container.
+- Connects to Bybit WebSockets, piping live data through `asyncio.Queue`.
+- Pushes continuous directional probabilities to the UI via Server-Sent Events (SSE).
 
 ---
 
+<a id="-model-architecture"></a>
 ## 🧠 Model Architecture
 
-### LOB Transformer
+The core predictor is a **Custom PyTorch Transformer**, built to process sequential financial feature vectors rather than NLP tokens.
 
-The core prediction model is a **custom Transformer Encoder** built from scratch in PyTorch — not a pre-trained NLP model, but one specifically designed for time-series financial data.
+| Component | Detail | Why |
+|---|---|---|
+| **Input Shape** | `[Batch × Seq_Len × N_Features]` | Matches sliding-window LOB snapshots. |
+| **Embedding** | Linear projection (`d_model = 64`) | Maps continuous features to attention space. |
+| **Positional Encoding** | Sinusoidal | Preserves the rigid chronological tick order. |
+| **Encoder Layers** | Stacked Multi-Head Attention | Discovers temporal order flow sequences. |
+| **Pooling** | CLS-token reduction | Compresses sequence state into a 1D vector. |
 
-| Component | Detail |
-|---|---|
-| **Input Shape** | `[Batch × Sequence_Length × N_Features]` |
-| **Embedding** | Linear projection → `d_model = 64` |
-| **Positional Encoding** | Sinusoidal (captures order of LOB snapshots over time) |
-| **Encoder Layers** | Stacked `TransformerEncoderLayer` blocks |
-| **Attention** | Multi-Head Self-Attention (each head learns different market patterns) |
-| **Pooling** | CLS-token pooling (one summary vector from the full sequence) |
-| **Output Heads** | 3 parallel task heads (see below) |
+### The Multi-Task Output Head
 
-#### Multi-Task Output Heads
+Instead of just guessing "UP" or "DOWN", the model is forced to simultaneously solve three auxiliary problems. This creates stronger gradient signals.
 
-```
+```text
                     ┌────────────────────────────────────────────┐
                     │           CLS Token Representation         │
                     │          (compressed market state)         │
@@ -271,471 +195,243 @@ The core prediction model is a **custom Transformer Encoder** built from scratch
               │  ▪ 30 second   ← ★  │  │ ▪ Volume Imbalance        │
               │  ▪ 5 minute          │  │   (regression: buy/sell   │
               │                      │  │    pressure ratio)        │
-              │  Labels:             │  │                           │
-              │   +1 = price UP      │  │  These help the model     │
-              │    0 = price FLAT    │  │  learn richer market      │
-              │   -1 = price DOWN    │  │  microstructure signals   │
               └──────────────────────┘  └───────────────────────────┘
 ```
-
-> **Why multi-task?** Training on related tasks simultaneously (direction + spread + volume) forces the model to learn deeper representations of market microstructure rather than just pattern-matching price labels. This is a technique used by many professional quant shops.
+**Why multi-task?** Predicting order book spread compression forces the internal layers to understand microstructural liquidity mechanics rather than blindly pattern-matching price jumps.
 
 ---
 
+<a id="-feature-engineering"></a>
 ## 📊 Feature Engineering
 
-Raw LOB data is transformed into **engineered numerical features** before being fed to the model. Each feature captures a specific aspect of market microstructure:
+Neural networks struggle with raw order book shapes. The system transforms the raw state into mathematically stationary features:
 
-```
+```text
 RAW LOB SNAPSHOT
- bid_price_1, bid_size_1, bid_price_2, bid_size_2, ... bid_price_5, bid_size_5
- ask_price_1, ask_size_1, ask_price_2, ask_size_2, ... ask_price_5, ask_size_5
-                                  │
-                                  ▼
-          ┌───────────────────────────────────────────────┐
-          │            FEATURE ENGINEERING                 │
-          │                                               │
-          │  ┌──────────────────────────────────────────┐ │
-          │  │  PRICE FEATURES                          │ │
-          │  │  • mid_price   = (best_bid + best_ask)/2 │ │
-          │  │  • spread      = best_ask - best_bid     │ │
-          │  │  • spread_pct  = spread / mid_price      │ │
-          │  └──────────────────────────────────────────┘ │
-          │                                               │
-          │  ┌──────────────────────────────────────────┐ │
-          │  │  ORDER FLOW FEATURES                     │ │
-          │  │  • order_imbalance = (bid_vol - ask_vol) │ │
-          │  │                    / (bid_vol + ask_vol) │ │
-          │  │    → +1 = all buyers, -1 = all sellers   │ │
-          │  │                                          │ │
-          │  │  • WOFI (Weighted Order Flow Imbalance)  │ │
-          │  │    → Imbalance weighted by proximity     │ │
-          │  │      to best bid/ask (levels 1-5)        │ │
-          │  └──────────────────────────────────────────┘ │
-          │                                               │
-          │  ┌──────────────────────────────────────────┐ │
-          │  │  DEPTH FEATURES                          │ │
-          │  │  • depth_ratio  = total_bid / total_ask  │ │
-          │  │  • depth_delta  = change in total depth  │ │
-          │  │  • level_slopes = price gaps between     │ │
-          │  │                   consecutive LOB levels │ │
-          │  └──────────────────────────────────────────┘ │
-          │                                               │
-          │  ┌──────────────────────────────────────────┐ │
-          │  │  TEMPORAL FEATURES                       │ │
-          │  │  • rolling_vol_delta = Δ in traded vol   │ │
-          │  │  • price_momentum    = mid_price change  │ │
-          │  │    over last N ticks                     │ │
-          │  └──────────────────────────────────────────┘ │
-          └───────────────────────────────────────────────┘
-                                  │
-                                  ▼
-             Feature Vector: [N_features] per snapshot
-             Sliding Window:  last K snapshots → [K × N] tensor
+ bid_price_1, bid_size_1, ... bid_size_5
+ ask_price_1, ask_size_1, ... ask_size_5
+                │
+                ▼
+      FEATURE TRANSFORMATION
+  ┌─────────────────────────────────────────┐
+  │ • mid_price       = (best_bid+best_ask)/2
+  │ • spread          = ask_1 - bid_1       │
+  │ • order_imbalance = (bidV - askV)/(tot) │
+  │ • WOFI            = depth-weighted imbalance
+  │ • depth_ratio     = sum(bids)/sum(asks) │
+  │ • rolling_vol_delta = change in volume  │
+  └─────────────────────────────────────────┘
+                │
+                ▼
+          Feature Vector
 ```
 
 ---
 
+<a id="-market-regime-detection-hmm"></a>
 ## 🌊 Market Regime Detection (HMM)
 
-In addition to the Transformer's price direction signal, AlphaLOB runs a parallel **Hidden Markov Model (HMM)** to classify the current market *regime*. This is important because the same buy/sell pressure means very different things in different market conditions.
+An **HMM (Hidden Markov Model)** is a probabilistic classifier that figures out the unobservable state of a system based on visible observations.
 
-```
-                      MARKET REGIME CLASSIFIER
-                      ━━━━━━━━━━━━━━━━━━━━━━━━
+We utilize a 3-state Gaussian HMM (via `hmmlearn`) to track the current meta-state of the order book:
+1. **TRENDING (State 0):** Low spread, persistent directional order flow.
+2. **MEAN-REVERTING (State 1):** Tight spread, balanced liquidity.
+3. **VOLATILE (State 2):** Wide spread, erratic sweeps, high variance.
 
-  Feature Stream ──▶ HMM (hmmlearn GaussianHMM)
-                          │
-                          ▼
-              ┌───────────────────────────┐
-              │  3 Hidden Market States   │
-              │                           │
-              │  State 0: 📈 TRENDING     │  Low spread, directional
-              │           momentum-driven │  flow, one-sided book
-              │                           │
-              │  State 1: ↔️ MEAN-REVERTING│  Tight spread, balanced
-              │           range-bound     │  book, high liquidity
-              │                           │
-              │  State 2: ⚡ VOLATILE      │  Wide spread, erratic
-              │           noisy / news    │  order flow, thin book
-              └───────────────────────────┘
-                          │
-                          ▼
-              Combined Signal = Transformer Prediction
-                              + HMM Regime Context
-
-  Example: "BUY signal in VOLATILE regime" → lower confidence
-           "BUY signal in TRENDING regime" → higher confidence
-```
+**Why?** A "BUY" signal from the Transformer in a *Trending* regime carries high confidence. The same signal in a *Volatile* regime represents noise and is filtered out.
 
 ---
 
+<a id="-low-latency-inference-stack"></a>
 ## ⚡ Low-Latency Inference Stack
 
-One of the most critical engineering decisions in AlphaLOB is the path from a large PyTorch model to sub-millisecond CPU inference:
+The core constraint of the project is ensuring predictions return in **<15ms on CPU**.
 
+| Trait | PyTorch (Training) | ONNX Runtime (Production) |
+|---|---|---|
+| Footprint | ~2 GB (with CUDA) | ~50 MB |
+| Graph | Dynamic, Autograd | Static, heavily optimized |
+| Latency | ~50ms (CPU) | **1-5ms (CPU)** |
+| Hardware | Requires GPU | Standard Cloud CPU |
+
+### Concurrency Pattern
+
+To ensure ONNX inference doesn't block the FastAPI HTTP event loop, the backend strictly uses an asynchronous handoff pattern:
+
+```text
+LOB Snapshot ──▶ [Feature Worker / asyncio task]
+                         │
+                         ▼
+             [asyncio.Queue (zero-copy)]
+                         │
+                         ▼
+             [Inference Worker / ThreadPoolExecutor]
+             ONNX Session.run() executes here
+                         │
+                         ▼
+             [FastAPI SSE Event Loop] ──▶ User Dashboard
 ```
-TRAINING TIME                           PRODUCTION TIME
-━━━━━━━━━━━━━━━                         ━━━━━━━━━━━━━━━━
-
-PyTorch Model                           ONNX Runtime
-  ▪ Full autograd graph                   ▪ No Python overhead
-  ▪ ~150MB with optimizer                 ▪ Static compute graph
-  ▪ GPU dependent                         ▪ CPU-optimized kernels
-  ▪ ~50ms inference                       ▪ ~1-5ms inference
-                                          ▪ No GPU required
-        │                                       ▲
-        │   torch.onnx.export()                 │
-        └──────────────────────────────────────▶│
-                                          lob_transformer.onnx
-
-INFERENCE PIPELINE (per tick)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- LOB Snapshot
-     │
-     ▼  [Feature Worker - asyncio task]
- Feature Vector
-     │
-     ▼  [asyncio.Queue - zero-copy handoff]
- Queue Buffer
-     │
-     ▼  [Inference Worker - ThreadPoolExecutor]
- ONNX Runtime Session
-     │  InferenceSession.run()
-     │  (CPU: OpenMP parallelism)
-     ▼
- Prediction Dict
-     │
-     ▼  [FastAPI SSE Router]
- data: {"signal": "UP", "confidence": 0.82, ...}
-     │
-     ▼
- Web Dashboard (EventSource)
-```
-
-> **Why asyncio + ThreadPool?** ONNX inference is CPU-bound (not I/O-bound), so it blocks Python's event loop. We offload it to a ThreadPoolExecutor, keeping FastAPI fully responsive to incoming HTTP connections while the model computes — a critical pattern for production ML APIs.
+**Why this matters:** This ensures the web server can concurrently serve thousands of HTTP connections without stuttering while the machine learning model monopolizes the CPU thread.
 
 ---
 
+<a id="-api-reference"></a>
 ## 🌐 API Reference
 
-The FastAPI server exposes four categories of endpoints, all served from a single Docker container:
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/` | Web Dashboard HTML/JS |
+| `GET` | `/signals` | SSE continuous stream of predictions |
+| `POST` | `/predict` | Immediate one-shot JSON prediction |
+| `GET` | `/health` | Diagnostics and model memory statuses |
 
-```
-BASE URL: https://hemanthnaidug-alphalob.hf.space
-          (or http://localhost:8000 locally)
-
-┌─────────────────────────────────────────────────────────────────┐
-│                       API ENDPOINTS                             │
-├──────────┬──────────────────────┬──────────────────────────────┤
-│ Method   │ Endpoint             │ Description                  │
-├──────────┼──────────────────────┼──────────────────────────────┤
-│ GET      │ /                    │ Live dashboard UI            │
-│ GET      │ /signals             │ SSE stream of live signals   │
-│ POST     │ /predict             │ One-shot snapshot inference  │
-│ POST     │ /backtest            │ Launch historical simulation │
-│ GET      │ /health              │ Model + queue metrics        │
-│ GET      │ /docs                │ Auto-generated Swagger UI    │
-└──────────┴──────────────────────┴──────────────────────────────┘
-```
-
-### `/predict` — REST Snapshot Inference
-
-Send a raw LOB snapshot as JSON; receive an instant prediction.
-
+### `/predict` REST Example
 ```json
-// REQUEST
-POST /predict
-Content-Type: application/json
-
+// POST /predict body
 {
   "bid_prices": [30000, 29998, 29995, 29990, 29985],
   "bid_sizes":  [300,   600,   100,   450,   200],
   "ask_prices": [30005, 30007, 30010, 30015, 30020],
-  "ask_sizes":  [50,    200,   500,   300,   150],
-  "timestamp":  1748700000000
+  "ask_sizes":  [50,    200,   500,   300,   150]
 }
 
-// RESPONSE
+// Response
 {
-  "signal_5s":     "UP",
-  "signal_30s":    "UP",
-  "signal_5min":   "FLAT",
-  "confidence":    0.82,
-  "regime":        "TRENDING",
-  "spread_compression": true,
-  "volume_imbalance":   0.43,
-  "latency_ms":    2.3
+  "signal_30s": "UP",
+  "confidence": 0.82,
+  "regime": "TRENDING",
+  "latency_ms": 2.1
 }
 ```
 
-### `/signals` — Server-Sent Events Stream
-
-Connect once; receive a continuous stream of live predictions:
-
+### `/signals` SSE Snippet
 ```javascript
-// Browser / Client
 const source = new EventSource('/signals');
-source.onmessage = (event) => {
-    const prediction = JSON.parse(event.data);
-    console.log(prediction.signal_30s); // "UP", "DOWN", "FLAT"
+source.onmessage = (e) => {
+    let data = JSON.parse(e.data);
+    console.log(`Live Signal: ${data.signal_30s}`);
 };
-
-// Server emits every tick:
-// data: {"signal_30s": "UP", "confidence": 0.79, "regime": "TRENDING", ...}
-// data: {"signal_30s": "FLAT", "confidence": 0.61, "regime": "MEAN-REVERTING", ...}
 ```
 
 ---
 
-## 📁 Repository Structure
-
-```
-AlphaLOB/
-│
-├── 📓 notebooks/colab/
-│   ├── Phase1_DataPipeline.ipynb      ← Data ingestion + feature engineering
-│   ├── Phase2_ModelTraining.ipynb     ← Transformer training + ONNX export
-│   ├── Phase3_Backtesting.ipynb       ← Walk-forward historical simulation
-│   └── Phase4_LiveInference.ipynb     ← End-to-end live pipeline demo
-│
-├── 🐍 src/
-│   ├── api/
-│   │   ├── main.py                    ← FastAPI app + asyncio event loop
-│   │   ├── schemas.py                 ← Pydantic type-safe models
-│   │   └── routes/
-│   │       ├── signals.py             ← SSE live streaming endpoint
-│   │       ├── predict.py             ← REST one-off inference endpoint
-│   │       ├── backtest.py            ← Historical simulation endpoint
-│   │       └── model_health.py        ← Health checks + queue metrics
-│   │
-│   ├── workers/
-│   │   ├── feature_worker.py          ← Real-time feature computation
-│   │   └── inference_worker.py        ← CPU-bound ONNX threadpool worker
-│   │
-│   ├── domain/
-│   │   ├── features.py                ← Pure LOB feature engineering logic
-│   │   ├── inference.py               ← ONNX Runtime session wrapper
-│   │   └── models/
-│   │       ├── lob_transformer.py     ← PyTorch model definition
-│   │       └── regime_hmm.py          ← HMM regime classifier
-│   │   └── backtesting/
-│   │       ├── engine.py              ← Walk-forward backtest engine
-│   │       └── metrics.py             ← Sharpe, drawdown, accuracy calc
-│   │
-│   ├── data/
-│   │   ├── bybit_ws.py                ← Live Bybit WebSocket ingestion
-│   │   └── synthetic_lob.py           ← Offline synthetic data generator
-│   │
-│   └── infrastructure/
-│       ├── duckdb_client.py           ← Embedded analytics DB client
-│       └── mlflow_sqlite.py           ← Lightweight metric tracking
-│
-├── 🤖 models/
-│   └── lob_transformer.onnx           ← Compiled model weights (production)
-│
-├── 📋 docs/adr/                       ← Architecture Decision Records
-├── 🧪 tests/                          ← Unit & integration tests
-├── 📜 scripts/                        ← Utility scripts
-├── 🐳 Dockerfile                      ← Single-container build
-├── 📦 requirements.txt                ← Pinned Python dependencies
-├── ⚙️  render.yaml                     ← Render.com deployment config
-└── 🦆 alphalob.duckdb                 ← Embedded analytics database
-```
-
----
-
+<a id="-quick-start"></a>
 ## 🚀 Quick Start
 
-### Option 1: Use the Live Demo (No Setup Required)
-
-**[→ Open AlphaLOB on HuggingFace Spaces](https://huggingface.co/spaces/hemanthnaidug/AlphaLOB)**
-
-The live deployment runs 24/7 with a **Synthetic LOB Generator** — so you can see real predictions without needing any API keys.
-
----
-
-### Option 2: Run Locally
-
-#### Prerequisites
-
-- Python 3.11+
-- Git
-
-#### Steps
+Run the entire system completely locally with synthetic mock data (no Bybit API keys needed).
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/GokavalasaHemanthNaidu/AlphaLOB.git
 cd AlphaLOB
-
-# 2. (Optional) Create a virtual environment
-python -m venv venv
-source venv/bin/activate      # Linux/macOS
-venv\Scripts\activate         # Windows
-
-# 3. Install dependencies
 pip install -r requirements.txt
-
-# 4. Start the inference server
-#    (Uses built-in Synthetic LOB — no API keys needed!)
 python -m uvicorn src.api.main:app --port 8000 --reload
-
-# 5. Open the live dashboard
-#    Navigate to: http://localhost:8000
-```
-
-You'll immediately see Server-Sent Events streaming live predictions to the dashboard — no external connections required.
-
-#### Running Notebooks (Training)
-
-To train the model from scratch, run the Colab notebooks in order:
-
-```
-1. notebooks/colab/Phase1_DataPipeline.ipynb
-   → Fetches historical Bybit data, engineers features, saves to DuckDB
-
-2. notebooks/colab/Phase2_ModelTraining.ipynb
-   → Trains the LOB Transformer, exports lob_transformer.onnx
-
-3. notebooks/colab/Phase3_Backtesting.ipynb
-   → Walk-forward backtesting on held-out historical data
-
-4. notebooks/colab/Phase4_LiveInference.ipynb
-   → Full end-to-end demo of the live inference pipeline
+# Open http://localhost:8000
 ```
 
 ---
 
-## 🐳 Docker Deployment
+<a id="-repository-structure"></a>
+## 📁 Repository Structure
 
-The entire pipeline — API server, feature worker, inference worker — runs in a **single Docker container**.
-
-```bash
-# Build
-docker build -t alphalob:latest .
-
-# Run
-docker run -p 8000:7860 alphalob:latest
-
-# Visit: http://localhost:8000
-```
-
-**Why single container?** See [Design Decisions](#-design-decisions) below.
-
----
-
-## 📈 MLOps & Drift Monitoring
-
-AlphaLOB includes a lightweight production monitoring system without heavy infrastructure:
-
-```
-DRIFT MONITORING PIPELINE
-━━━━━━━━━━━━━━━━━━━━━━━━━
- Incoming Feature Vector
-         │
-         ▼
- KL-Divergence Calculator
- (compare current distribution vs training baseline)
-         │
-         ├── KL < threshold → ✅ Normal — model reliable
-         │
-         └── KL > threshold → ⚠️ Drift Detected
-                                  → Log alert to SQLite
-                                  → Flag predictions with low_confidence
-
-METRIC STORAGE
-━━━━━━━━━━━━━━
- SQLite (mlflow_sqlite.py)
-  ▪ Prediction accuracy per horizon
-  ▪ Feature distribution stats
-  ▪ Inference latency percentiles (p50, p95, p99)
-  ▪ Queue depth metrics
-  ▪ Drift alert history
-
-DuckDB (alphalob.duckdb)
-  ▪ Historical feature snapshots (for replay/analysis)
-  ▪ Backtest results archive
-  ▪ Fast columnar queries for dashboard analytics
+```text
+AlphaLOB/
+├── README.md                      ← Entry point
+├── docs/                          ← Comprehensive technical documentation
+│   ├── PRD.md
+│   ├── TRD.md
+│   └── ... 
+├── notebooks/colab/
+│   ├── Phase1_DataPipeline.ipynb  ← Eng features
+│   ├── Phase2_ModelTraining.ipynb ← Trains PyTorch model
+│   └── Phase3_Backtesting.ipynb   ← Walk-forward simulator
+├── src/
+│   ├── api/main.py                ← FastAPI + asyncio loop
+│   ├── workers/                   ← Inference and feature tasks
+│   ├── domain/inference.py        ← ONNX/hmmlearn wrappers
+│   ├── data/bybit_ws.py           ← Websocket client
+│   └── infrastructure/duckdb.py   ← DB layer schemas
+├── models/weights/
+│   ├── lobster_transformer.onnx   ← Production static graph
+│   └── regime_hmm.bin             ← Trained HMM model
+├── tests/                         ← Pytest suites
+├── Dockerfile                     ← Isolated container definition
+└── requirements.txt               ← Strict pinned dependencies
 ```
 
 ---
 
-## 🛠️ Tech Stack
-
-| Layer | Technology | Why |
-|---|---|---|
-| **ML Framework** | PyTorch | Industry standard for custom architecture research |
-| **Production Inference** | ONNX Runtime | 10-50x faster than PyTorch for CPU inference |
-| **Market Regime** | hmmlearn (GaussianHMM) | Probabilistic unsupervised regime detection |
-| **API Server** | FastAPI + Uvicorn | Async-first, auto Swagger docs, production ready |
-| **Real-Time Streaming** | Server-Sent Events (SSE) | Lightweight push protocol; no WebSocket complexity |
-| **Async Concurrency** | asyncio + ThreadPoolExecutor | Non-blocking I/O with CPU offloading |
-| **Analytics DB** | DuckDB | Embedded columnar DB; fast aggregations, no server |
-| **Metric Tracking** | SQLite (custom MLflow-lite) | Zero-dependency experiment tracking |
-| **Data Ingestion** | Bybit WebSocket API | Sub-second LOB updates from crypto exchange |
-| **Data Validation** | Pydantic v2 | Type-safe schemas at API boundary |
-| **Containerization** | Docker | Single-container reproducible deployment |
-| **Cloud Hosting** | HuggingFace Spaces | Free GPU/CPU hosting with Docker SDK |
-| **Notebooks** | Google Colab | Free GPU for training |
-| **Data Engineering** | Pandas + NumPy | Feature matrix construction |
-
----
-
+<a id="-design-decisions"></a>
 ## 🎯 Design Decisions
 
-### Why Single Docker Container? (No Kafka, No Redis)
+*Decisions targeting high-performance financial systems:*
 
-Many production trading systems use distributed message buses like **Apache Kafka** or **Redis Streams** to connect pipeline components. AlphaLOB deliberately replaces these with Python's built-in `asyncio.Queue`:
-
-```
-Traditional HFT Architecture:
-  Feature Worker ──▶ [Kafka Topic] ──▶ Inference Worker ──▶ [Redis] ──▶ API
-  ↑ Heavy, requires separate containers, network overhead, ops complexity
-
-AlphaLOB Architecture:
-  Feature Worker ──▶ [asyncio.Queue] ──▶ Inference Worker ──▶ [Queue] ──▶ API
-  ↑ Zero-copy in-process handoff, sub-microsecond, single container
-```
-
-**Trade-off**: This collapses the entire pipeline into one process, which is perfectly suitable for a single-symbol, single-exchange system running on a single machine — which is exactly this use case. Kafka would be warranted for multi-exchange, multi-symbol, multi-consumer architectures.
-
-### Why ONNX over PyTorch Serving (TorchServe)?
-
-| Concern | PyTorch / TorchServe | ONNX Runtime |
-|---|---|---|
-| Container size | ~2GB (CUDA drivers) | ~50MB |
-| CPU inference | ~50ms | ~1-5ms |
-| External deps | Needs GPU for speed | Runs on any CPU |
-| Free tier hosting | ❌ Impractical | ✅ Perfect fit |
-
-### Why DuckDB over PostgreSQL?
-
-DuckDB is an **embedded analytical database** — it runs inside the Python process with no server. For read-heavy analytics (querying millions of historical LOB rows for backtesting), DuckDB's columnar engine is **10-100x faster** than row-oriented PostgreSQL, and requires zero infrastructure.
+- **`asyncio.Queue` over Kafka/Redis:** Kafka implies immense network overhead and external container orchestration. By utilizing an in-memory Python `asyncio.Queue`, the system achieves zero-copy, sub-microsecond handoffs within a single process.
+- **ONNX over TorchServe:** TorchServe brings heavy Java dependencies, massive CUDA binaries, and 50ms+ latency. Exporting a static graph to `.onnx` shrinks the container payload to <50MB and yields ~2ms CPU inference.
+- **DuckDB over PostgreSQL:** Since financial tick data is purely time-series and append-only, DuckDB's columnar analytics engine queries historical ranges 10-100x faster than PostgreSQL’s row-store, without requiring a background daemon.
+- **Single Container Deployment:** Because of the tight dependencies above, the entire end-to-end framework deploys trivially to free-tier CPU instances (like Hugging Face Spaces) with zero DevOps complexity.
 
 ---
 
+<a id="-mlops--drift-monitoring"></a>
+## 📈 MLOps & Drift Monitoring
+
+To prevent "silent failures" where the market changes behavior but the model keeps trading, AlphaLOB utilizes a lightweight monitoring daemon.
+
+```text
+[Incoming LOB Feature Space] ────── KL-Divergence ────── [Baseline Train Space]
+                                        │
+                                        ▼
+                             Drift Score > Threshold?
+                            /                        \
+                    [✅ Normal]                 [⚠️ ALERT SQL]
+```
+
+- **SQLite Tracker:** Used as an MLflow-lite instance. Logs `accuracy`, `latency_p99`, queue depth, and regime transition probabilities.
+- **DuckDB Archive:** Houses massive numerical historical feature snapshots for deep post-mortem analysis.
+
+---
+
+<a id="️-tech-stack-table"></a>
+## 🛠️ Tech Stack Table
+
+| Layer | Technology | Why We Used It |
+|---|---|---|
+| **ML Framework** | PyTorch | Deep customization of Transformer Self-Attention |
+| **Edge Inference** | ONNX Runtime | High-speed, GPU-independent C++ engine execution |
+| **Regime Detection** | `hmmlearn` | Unsupervised Gaussian HMM state clustering |
+| **API Server** | FastAPI | Async-first HTTP routing with built-in Pydantic |
+| **Real-Time Data** | Server-Sent Events | Unidirectional push without WebSocket bloat |
+| **Concurrency** | `asyncio.Queue` | Non-blocking inter-worker memory transfers |
+| **Database** | DuckDB | Blistering fast embedded columnar storage |
+| **Tracking** | SQLite | Serverless metric tracking |
+| **Container** | Docker | 100% reproducible deployment context |
+
+---
+
+<a id="️-roadmap"></a>
 ## 🗺️ Roadmap
 
-```
-✅ Phase 1  Data Pipeline + Feature Engineering (Complete)
-✅ Phase 2  PyTorch Transformer + ONNX Export (Complete)
-✅ Phase 3  Backtesting Engine (Complete)
-✅ Phase 4  Live FastAPI + SSE Dashboard (Complete)
-✅ Phase 5  Docker + HuggingFace Deployment (Complete)
-
-🔜 Phase 6  Multi-symbol support (ETH, SOL, BNB)
-🔜 Phase 7  Reinforcement Learning execution layer
-             (position sizing based on signal confidence)
-🔜 Phase 8  Tick-level data (upgrade from snapshot LOB)
-🔜 Phase 9  Federated multi-exchange signal fusion
-```
+- ✅ **Phases 1-5 (Complete):** Data ingestion, feature engineering, Transformer training, ONNX export, FastAPI inference, Docker deployment.
+- 🔜 **Phase 6:** Multi-symbol support (ETH, SOL, BNB simultaneously).
+- 🔜 **Phase 7:** Reinforcement Learning execution layer (sizing based on signal).
+- 🔜 **Phase 8:** Tick-level trade ingestion (upgrading from snapshot frequency).
+- 🔜 **Phase 9:** Federated multi-exchange signal fusion.
 
 ---
 
-## 📄 License
+<a id="-comprehensive-documentation-docs-folder"></a>
+## 📚 Comprehensive Documentation (Docs Folder)
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+For an extraordinarily deep dive into how this system was architected, designed, and structured, review the core planning files located in the [`/docs`](docs/) directory:
+
+| Document | Purpose | Link |
+|---|---|---|
+| **PRD** | Product Requirements, Use Cases & Personas | [`docs/PRD.md`](docs/PRD.md) |
+| **TRD** | Technical Constraints & Stack Specifications | [`docs/TRD.md`](docs/TRD.md) |
+| **App Flow** | Web Dashboard Navigation & Client State | [`docs/AppFlow.md`](docs/AppFlow.md) |
+| **UI/UX Brief** | Terminal Theme Constants & WCAG Checks | [`docs/UIUXBrief.md`](docs/UIUXBrief.md) |
+| **Backend Schema** | DuckDB & SQLite Table Mappings | [`docs/BackendSchema.md`](docs/BackendSchema.md) |
+| **Implementation Plan** | Ordered 7-Phase Build Roadmap | [`docs/ImplementationPlan.md`](docs/ImplementationPlan.md) |
 
 ---
 
