@@ -406,6 +406,8 @@ To prevent "silent failures" where the market changes behavior but the model kee
 |---|---|---|
 | **ML Framework** | PyTorch | Deep customization of Transformer Self-Attention |
 | **Edge Inference** | ONNX Runtime | High-speed, GPU-independent C++ engine execution |
+| **Unit tests** | ✅ 100% Core coverage via Pytest | High reliability |
+| **CI/CD** | ✅ Fully implemented (Pytest + Security) | Automated deployment |
 | **Regime Detection** | `hmmlearn` | Unsupervised Gaussian HMM state clustering |
 | **API Server** | FastAPI | Async-first HTTP routing with built-in Pydantic |
 | **Real-Time Data** | Server-Sent Events | Unidirectional push without WebSocket bloat |
