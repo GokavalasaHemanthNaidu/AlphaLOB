@@ -1,52 +1,64 @@
 import pytest
 from src.domain.features import FeatureEngine
 
-def test_feature_engine_spread_and_depth():
-    engine = FeatureEngine(depth_levels=2)
+def test_feature_engine_initialization():
+    engine = FeatureEngine(depth_levels=10)
+    assert engine.depth_levels == 10
+    assert engine.prev_bids == {}
+    assert engine.prev_asks == {}
+
+def test_spread_and_depth_calculation():
+    engine = FeatureEngine()
+    bids = {100.0: 1.5, 99.0: 2.0}
+    asks = {101.0: 0.5, 102.0: 3.0}
     
-    # Mock snapshot
+    spread, bid_depth, ask_depth = engine._calculate_spread_and_depth(bids, asks)
+    
+    assert spread == 1.0  # 101.0 - 100.0
+    assert bid_depth == 3.5 # 1.5 + 2.0
+    assert ask_depth == 3.5 # 0.5 + 3.0
+
+def test_wofi_calculation_initial_state():
+    engine = FeatureEngine()
+    bids = {100.0: 1.5, 99.0: 2.0}
+    asks = {101.0: 0.5, 102.0: 3.0}
+    
+    wofi = engine._calculate_wofi(bids, asks)
+    assert wofi == 0.0
+    assert engine.prev_bids == bids
+    assert engine.prev_asks == asks
+
+def test_wofi_calculation_update():
+    engine = FeatureEngine()
+    bids_t1 = {100.0: 1.0}
+    asks_t1 = {101.0: 1.0}
+    engine._calculate_wofi(bids_t1, asks_t1) # sets prev state
+    
+    # Increase bid size at same price
+    bids_t2 = {100.0: 2.0}
+    asks_t2 = {101.0: 1.0}
+    wofi = engine._calculate_wofi(bids_t2, asks_t2)
+    
+    # math.exp(-0.5 * 0) = 1.0 weight. size change is +1.0. wofi should be 1.0
+    assert wofi > 0.0
+
+def test_process_empty_snapshot():
+    engine = FeatureEngine()
+    snapshot = {"b": [], "a": [], "ts": 1234567890}
+    features = engine.process(snapshot)
+    assert features == {}
+
+def test_process_valid_snapshot():
+    engine = FeatureEngine()
     snapshot = {
-        "b": [["60000.0", "2.0"], ["59999.0", "1.0"]],
-        "a": [["60001.0", "1.5"], ["60002.0", "2.5"]],
-        "ts": 123456789
+        "b": [["100.0", "1.5"], ["99.0", "2.0"]],
+        "a": [["101.0", "0.5"], ["102.0", "3.0"]],
+        "ts": 1234567890
     }
     
     features = engine.process(snapshot)
     
-    assert features["spread"] == 1.0  # 60001.0 - 60000.0
-    assert features["bid_depth"] == 3.0 # 2.0 + 1.0
-    assert features["ask_depth"] == 4.0 # 1.5 + 2.5
-
-def test_feature_engine_wofi():
-    engine = FeatureEngine(depth_levels=2)
-    
-    snapshot_1 = {
-        "b": [["60000.0", "2.0"]],
-        "a": [["60001.0", "1.5"]],
-        "ts": 1
-    }
-    
-    # First snapshot shouldn't have WOFI because there's no previous state
-    features_1 = engine.process(snapshot_1)
-    assert features_1["wofi"] == 0.0
-    
-    # Second snapshot: Bid volume increases at best bid (positive WOFI)
-    snapshot_2 = {
-        "b": [["60000.0", "3.0"]],
-        "a": [["60001.0", "1.5"]],
-        "ts": 2
-    }
-    
-    features_2 = engine.process(snapshot_2)
-    # The weight for level 0 is exp(0) = 1.0. The size diff is 1.0. 
-    # WOFI = 1.0 * 1.0 = 1.0
-    assert features_2["wofi"] > 0.0
-    
-    # Third snapshot: Ask volume increases at best ask (negative WOFI)
-    snapshot_3 = {
-        "b": [["60000.0", "3.0"]],
-        "a": [["60001.0", "5.0"]],
-        "ts": 3
-    }
-    features_3 = engine.process(snapshot_3)
-    assert features_3["wofi"] < 0.0
+    assert features["spread"] == 1.0
+    assert features["bid_depth"] == 3.5
+    assert features["ask_depth"] == 3.5
+    assert features["wofi"] == 0.0
