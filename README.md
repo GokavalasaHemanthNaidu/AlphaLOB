@@ -8,7 +8,7 @@ app_port: 7860
 ---
 <div align="center">
 
-<a href="https://github.com/GokavalasaHemanthNaidu/AlphaLOB"><img src="https://img.shields.io/badge/AlphaLOB-HFT%20AI%20Engine-blueviolet?style=for-the-badge&logo=lightning&logoColor=white" height="40"/></a>
+<a href="https://github.com/GokavalasaHemanthNaidu/AlphaLOB"><img src="https://img.shields.io/badge/AlphaLOB-HFT%20AI%20Engine-8A2BE2?style=for-the-badge&logo=lightning&logoColor=white" height="40"/></a>
 
 # ⚡ AlphaLOB
 ### Low-Latency Limit Order Book Signal Engine
@@ -19,7 +19,7 @@ app_port: 7860
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
 [![DuckDB](https://img.shields.io/badge/DuckDB-FFF000?style=flat-square&logo=duckdb&logoColor=black)](https://duckdb.org/)
-[![HuggingFace](https://img.shields.io/badge/🤗%20Live%20Demo-HuggingFace-yellow?style=flat-square)](https://huggingface.co/spaces/hemanthnaidug/AlphaLOB)
+[![HuggingFace](https://img.shields.io/badge/🤗%20Live%20Demo-HuggingFace-9400D3?style=flat-square)](https://huggingface.co/spaces/hemanthnaidug/AlphaLOB)
 
 **[🚀 Live Demo](https://huggingface.co/spaces/hemanthnaidug/AlphaLOB)** · **[🐛 Issues](https://github.com/GokavalasaHemanthNaidu/AlphaLOB/issues)**
 
